@@ -16,7 +16,7 @@
     --text-light: #333;
   }
 
-  /* Reset básico */
+  /* Reset */
   * {
     box-sizing: border-box;
   }
@@ -35,7 +35,7 @@
 
   header {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     text-align: center;
     margin-bottom: 1rem;
     position: relative;
@@ -78,7 +78,7 @@
 
   textarea {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     height: 120px;
     padding: 1rem;
     border: 2px solid var(--orange);
@@ -91,6 +91,7 @@
     box-shadow: 0 0 15px var(--orange-light);
     transition: background-color 0.5s ease, color 0.5s ease;
   }
+
   textarea::placeholder {
     color: #c68e59;
   }
@@ -112,11 +113,13 @@
     background-color: var(--orange-light);
   }
 
+  /* 📌 GRID RESPONSIVO */
   #grid {
     margin-top: 2rem;
-    max-width: 600px;
+    width: 100%;
+    max-width: 900px; /* permite mais colunas */
     display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(130px,1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
   }
 
@@ -134,6 +137,7 @@
     box-shadow: 0 0 10px #c67438;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
+
   .cell.marked {
     background-color: var(--gray-dark);
     color: var(--orange);
@@ -190,6 +194,7 @@
   }
 </style>
 </head>
+
 <body>
 <header>
   <h1>NeuroBingo</h1>
@@ -211,68 +216,70 @@
   const grid = document.getElementById('grid');
   const markedCount = document.getElementById('marked-count');
 
-  // Controla o tema
+  // Alterna tema claro/escuro
   toggleBtn.addEventListener('click', () => {
     body.classList.toggle('dark');
-    if(body.classList.contains('dark')){
-      toggleBtn.textContent = '☀️';
-    } else {
-      toggleBtn.textContent = '🌙';
-    }
+    toggleBtn.textContent = body.classList.contains('dark') ? '☀️' : '🌙';
   });
 
-  // Cria o bingo com os nomes
+  // Gera o bingo
   generateBtn.addEventListener('click', () => {
     grid.innerHTML = '';
     let names = input.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
-    if(names.length === 0) {
-      alert('Digite pelo menos um nome para gerar o bingo!');
+
+    if (names.length === 0) {
+      alert('Digite pelo menos um nome!');
       return;
     }
+
     names = shuffle(names);
 
-    for(let name of names){
+    for (let name of names) {
       const cell = document.createElement('div');
       cell.classList.add('cell');
       cell.textContent = name;
       cell.tabIndex = 0;
+
       cell.addEventListener('click', () => toggleMarked(cell));
       cell.addEventListener('keydown', (e) => {
-        if(e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           toggleMarked(cell);
         }
       });
+
       grid.appendChild(cell);
     }
+
     updateMarkedCount();
   });
 
-  function toggleMarked(cell){
+  function toggleMarked(cell) {
     cell.classList.toggle('marked');
     updateMarkedCount();
   }
 
-  function updateMarkedCount(){
+  function updateMarkedCount() {
     const marked = grid.querySelectorAll('.marked').length;
     const total = grid.children.length;
-    if(total === 0){
+
+    if (total === 0) {
       markedCount.textContent = '';
       return;
     }
-    if(marked === 0){
+    if (marked === 0) {
       markedCount.textContent = 'Nenhum marcado';
-    } else if(marked === total) {
+    } else if (marked === total) {
       markedCount.textContent = 'Todos marcados!';
     } else {
-      markedCount.textContent = marked + ' marcado' + (marked > 1 ? 's' : '');
+      markedCount.textContent = `${marked} marcado${marked > 1 ? 's' : ''}`;
     }
   }
 
-  // Embaralhar array
+  // Embaralha
   function shuffle(array) {
     let currentIndex = array.length, randomIndex;
-    while(currentIndex !== 0){
+    while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex--;
       [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
@@ -280,5 +287,6 @@
     return array;
   }
 </script>
+
 </body>
 </html>
