@@ -2,9 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Bingo Game Awards</title>
+<title>NeuroBingo</title>
 <style>
-  /* Fonte clássica e moderna */
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400&display=swap');
 
   :root {
@@ -28,15 +27,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* textura sutil de canvas antigo */
+    transition: background 0.5s, color 0.5s;
     background-image:
       radial-gradient(circle at 50% 50%, rgba(0,0,0,0.03) 0%, transparent 70%),
       repeating-radial-gradient(circle at center, transparent 0, transparent 5px, rgba(0,0,0,0.015) 6px, rgba(0,0,0,0.02) 7px);
   }
 
+  body.dark {
+    background: var(--bg-dark);
+    color: var(--text-light);
+  }
+
   h1 {
     font-family: var(--font-title);
-    font-size: 3.4rem;
+    font-size: 3rem;
     font-weight: 700;
     margin: 0;
     color: var(--accent);
@@ -50,7 +54,7 @@
     margin: 8px 0 30px 0;
     font-size: 1.1rem;
     font-style: italic;
-    color: var(--text-dark);
+    color: inherit;
     max-width: 600px;
     text-align: center;
     user-select: none;
@@ -67,17 +71,17 @@
     font-size: 16px;
     resize: vertical;
     outline: none;
-    background: #fefcf7;
+    background: var(--bg-light);
+    color: var(--text-dark);
     box-shadow:
       inset 1px 1px 6px rgba(180,140,40,0.15),
       1px 1px 4px rgba(150,110,20,0.2);
-    transition: border-color 0.25s ease;
+    transition: border-color 0.25s ease, background 0.5s, color 0.5s;
   }
-  textarea:focus {
-    border-color: var(--accent-dark);
-    box-shadow:
-      inset 2px 2px 8px rgba(180,140,40,0.35),
-      0 0 10px var(--accent-dark);
+
+  body.dark textarea {
+    background: #2c2b28;
+    color: var(--text-light);
   }
 
   button {
@@ -91,15 +95,16 @@
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    box-shadow:
-      0 4px 8px rgba(180,110,20,0.3);
+    box-shadow: 0 4px 8px rgba(180,110,20,0.3);
     transition: background-color 0.3s ease, transform 0.2s ease;
     user-select: none;
   }
+
   button:hover {
     background-color: var(--accent-dark);
     transform: scale(1.05);
   }
+
   button:active {
     transform: scale(0.97);
   }
@@ -127,31 +132,31 @@
     box-shadow:
       0 0 6px rgba(180,110,20,0.15),
       inset 0 0 6px rgba(180,110,20,0.1);
-    transition:
-      background-color 0.25s ease,
-      color 0.25s ease,
-      transform 0.2s ease;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
   }
+
+  body.dark .cell {
+    background-color: #2c2b28;
+    color: var(--text-light);
+    border-color: var(--accent);
+  }
+
   .cell:hover {
     background-color: var(--accent);
     color: var(--text-light);
     transform: scale(1.05);
-    box-shadow:
-      0 0 14px var(--accent),
-      inset 0 0 10px var(--accent);
+    box-shadow: 0 0 14px var(--accent), inset 0 0 10px var(--accent);
   }
+
   .cell.marked {
     background-color: var(--accent-dark);
     color: var(--text-light);
     border-color: var(--accent-dark);
     font-weight: 700;
     transform: scale(1.1);
-    box-shadow:
-      0 0 20px var(--accent-dark),
-      inset 0 0 12px var(--accent-dark);
+    box-shadow: 0 0 20px var(--accent-dark), inset 0 0 12px var(--accent-dark);
   }
 
-  /* Contador simples */
   #counter {
     margin-top: 15px;
     font-weight: 600;
@@ -159,29 +164,54 @@
     user-select: none;
   }
 
-  /* Pequeno rodapé */
-  footer {
-    margin-top: 55px;
-    font-size: 0.85rem;
-    color: var(--text-dark);
-    opacity: 0.5;
+  /* Volume e dark mode */
+  .controls {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-body);
+  }
+
+  .controls input[type="range"] {
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
-  <h1>Bingo Game Awards</h1>
-  <p class="subtitle">Um jogo de apostas para celebrar os melhores do ano nos games.</p>
+  <h1>NeuroBingo</h1>
+  <p class="subtitle">O NEUROBINGO ESTÁ DE VOLTA</p>
 
-  <textarea id="input" placeholder="Escreva um item por linha, ex:&#10;Melhor Direção de Arte&#10;Melhor Trilha Sonora&#10;Melhor Atuação&#10;..."></textarea>
+  <textarea id="input" placeholder="Escreva um item por linha, ex:
+Melhor Direção de Arte
+Melhor Trilha Sonora
+Melhor Atuação
+..."></textarea>
 
-  <button onclick="generateBingo()">Gerar Bingo</button>
+  <div class="controls">
+    <button onclick="generateBingo()">Gerar Bingo</button>
+    <button onclick="toggleTheme()">Alternar Tema</button>
+    <label>Volume: <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.3"></label>
+  </div>
 
   <div class="grid" id="grid"></div>
   <div id="counter">Nenhum marcado</div>
 
-  <footer>Feito com 🎮 por você!</footer>
+<audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
 
 <script>
+  const clickSound = document.getElementById('clickSound');
+  const volumeSlider = document.getElementById('volumeSlider');
+  clickSound.volume = volumeSlider.value;
+
+  volumeSlider.addEventListener('input', () => {
+    clickSound.volume = volumeSlider.value;
+  });
+
+  function toggleTheme() {
+    document.body.classList.toggle('dark');
+  }
+
   function generateBingo() {
     const grid = document.getElementById('grid');
     const counter = document.getElementById('counter');
@@ -192,8 +222,6 @@
     if (!text) return;
 
     const items = text.split('\n').filter(line => line.trim() !== '');
-
-    // Definir o grid quadrado (para parecer um bingo)
     const size = Math.ceil(Math.sqrt(items.length));
     grid.style.gridTemplateColumns = `repeat(${size}, minmax(120px, 1fr))`;
 
@@ -204,14 +232,12 @@
 
       cell.onclick = () => {
         cell.classList.toggle('marked');
+        clickSound.currentTime = 0;
+        clickSound.play();
+
         const markedCount = document.querySelectorAll('.cell.marked').length;
-        if (markedCount === 0) {
-          counter.innerText = 'Nenhum marcado';
-        } else if (markedCount === 1) {
-          counter.innerText = '1 marcado';
-        } else {
-          counter.innerText = markedCount + ' marcados';
-        }
+        counter.innerText = markedCount === 0 ? 'Nenhum marcado' :
+          markedCount === 1 ? '1 marcado' : markedCount + ' marcados';
       };
 
       grid.appendChild(cell);
