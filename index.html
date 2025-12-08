@@ -152,7 +152,10 @@
   <div class="grid" id="grid"></div>
   <div id="counter">Nenhum marcado</div>
 
-  <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
+  <!-- Som embutido, funciona sem depender de links externos -->
+  <audio id="clickSound" preload="auto">
+    <source src="data:audio/mp3;base64,//uQxAA... (base64 do click curto) ..." type="audio/mpeg">
+  </audio>
 
 <script>
   const clickSound = document.getElementById('clickSound');
