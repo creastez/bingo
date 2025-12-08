@@ -1,56 +1,330 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>NeuroBingo Custom</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeuroBingo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Inter&display=swap');
+
+    :root {
+      --bg-color: #fefcf7;
+      --title-color: #b35c00;
+      --cell-bg: #fefcf7;
+      --cell-hover: #b35c00;
+      --cell-marked: #7a3e00;
+      --text-color: #2e2b27;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .sidebar {
+      width: 250px;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+      background: #f2f2f2;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .color-section {
+      margin-bottom: 20px;
+    }
+
+    .color-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: left;
+      padding: 8px 0;
+      color: var(--title-color);
+      user-select: none;
+    }
+
+    .color-options {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 5px;
+    }
+
+    .color-options.open {
+      max-height: 150px;
+      margin-top: 10px;
+    }
+
+    .color-ball {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .color-ball:hover {
+      border-color: var(--title-color);
+    }
+
+    /* Indica a cor selecionada */
+    .color-ball.selected {
+      border-color: var(--title-color);
+      box-shadow: 0 0 5px var(--title-color);
+    }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+      box-sizing: border-box;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .title-group {
+      color: var(--title-color);
+      margin-bottom: 5px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-family: 'Playfair Display', serif;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-weight: 600;
+      margin: 4px 0 20px 0;
+      opacity: 0.7;
+      user-select: none;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid var(--title-color);
+      font-size: 16px;
+      resize: vertical;
+      box-sizing: border-box;
+      background: #fff; /* mantém sempre branco para melhor leitura */
+      color: #000;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 30px;
+      background-color: var(--title-color);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--cell-marked);
+    }
+
+    .grid {
+      display: grid;
+      grid-gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .cell {
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid var(--title-color);
+      background-color: var(--cell-bg);
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .cell:hover {
+      background-color: var(--cell-hover);
+      color: #fff;
+    }
+
+    .cell.marked {
+      background-color: var(--cell-marked);
+      color: #fff;
+    }
+
+    #counter {
+      font-weight: 700;
+      font-size: 1.1rem;
+      user-select: none;
+    }
+
+  </style>
 </head>
 <body>
   <div class="sidebar">
     <h2>Personalizar cores</h2>
-    <div class="color-picker">
-      <label>Fundo:</label>
-      <select id="bgColorSelect">
-        <option value="#fefcf7">Branco</option>
-        <option value="#1b1a17">Preto</option>
-        <option value="#2c2b28">Cinza</option>
-        <option value="#3c2a4d">Roxo</option>
-        <option value="#2b3a4d">Azul</option>
-        <option value="#4d3b2b">Marrom</option>
-      </select>
+
+    <div class="color-section">
+      <button class="color-toggle" data-target="bgColors">FUNDO ▼</button>
+      <div class="color-options" id="bgColors">
+        <div class="color-ball" style="background:#fefcf7;" data-color="#fefcf7"></div>
+        <div class="color-ball" style="background:#1b1a17;" data-color="#1b1a17"></div>
+        <div class="color-ball" style="background:#2c2b28;" data-color="#2c2b28"></div>
+        <div class="color-ball" style="background:#3c2a4d;" data-color="#3c2a4d"></div>
+        <div class="color-ball" style="background:#2b3a4d;" data-color="#2b3a4d"></div>
+        <div class="color-ball" style="background:#4d3b2b;" data-color="#4d3b2b"></div>
+      </div>
     </div>
-    <div class="color-picker">
-      <label>Título:</label>
-      <select id="titleColorSelect">
-        <option value="#b35c00">Laranja</option>
-        <option value="#7a3e00">Marrom escuro</option>
-        <option value="#555555">Cinza</option>
-        <option value="#4d3b2b">Marrom</option>
-        <option value="#2b3a4d">Azul escuro</option>
-        <option value="#3c2a4d">Roxo escuro</option>
-      </select>
+
+    <div class="color-section">
+      <button class="color-toggle" data-target="titleColors">TÍTULO ▼</button>
+      <div class="color-options" id="titleColors">
+        <div class="color-ball" style="background:#b35c00;" data-color="#b35c00"></div>
+        <div class="color-ball" style="background:#7a3e00;" data-color="#7a3e00"></div>
+        <div class="color-ball" style="background:#555555;" data-color="#555555"></div>
+        <div class="color-ball" style="background:#4d3b2b;" data-color="#4d3b2b"></div>
+        <div class="color-ball" style="background:#2b3a4d;" data-color="#2b3a4d"></div>
+        <div class="color-ball" style="background:#3c2a4d;" data-color="#3c2a4d"></div>
+      </div>
     </div>
-    <div class="color-picker">
-      <label>Células:</label>
-      <select id="cellColorSelect">
-        <option value="#fefcf7">Claro</option>
-        <option value="#2c2b28">Escuro</option>
-        <option value="#3c2a4d">Roxo</option>
-        <option value="#2b3a4d">Azul</option>
-        <option value="#4d3b2b">Marrom</option>
-      </select>
+
+    <div class="color-section">
+      <button class="color-toggle" data-target="cellColors">CÉLULAS ▼</button>
+      <div class="color-options" id="cellColors">
+        <div class="color-ball" style="background:#fefcf7;" data-color="#fefcf7"></div>
+        <div class="color-ball" style="background:#2c2b28;" data-color="#2c2b28"></div>
+        <div class="color-ball" style="background:#3c2a4d;" data-color="#3c2a4d"></div>
+        <div class="color-ball" style="background:#2b3a4d;" data-color="#2b3a4d"></div>
+        <div class="color-ball" style="background:#4d3b2b;" data-color="#4d3b2b"></div>
+      </div>
     </div>
   </div>
 
   <div class="main">
-    <h1 id="title">NeuroBingo</h1>
-    <p class="subtitle">O NEUROBINGO ESTÁ DE VOLTA</p>
+    <div class="title-group">
+      <h1 id="title">NeuroBingo</h1>
+      <p class="subtitle">O NEUROBINGO ESTÁ DE VOLTA</p>
+    </div>
+    
     <textarea id="input" placeholder="Escreva um item por linha..."></textarea>
     <button onclick="generateBingo()">Gerar Bingo</button>
+    
     <div class="grid" id="grid"></div>
-    <div id="counter">Nenhum marcado</div>
+    
+    <div id="counter" class="title-group">Nenhum marcado</div>
   </div>
 
-<script src="script.js"></script>
+  <script>
+    const grid = document.getElementById('grid');
+    const counter = document.getElementById('counter');
+
+    function generateBingo() {
+      grid.innerHTML = '';
+      counter.innerText = 'Nenhum marcado';
+
+      const text = document.getElementById('input').value.trim();
+      if (!text) return;
+
+      const items = text.split('\n').filter(line => line.trim() !== '');
+      const size = Math.ceil(Math.sqrt(items.length));
+      grid.style.gridTemplateColumns = `repeat(auto-fit, minmax(140px, 1fr))`;
+
+      items.forEach(name => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.innerText = name;
+
+        cell.onclick = () => {
+          cell.classList.toggle('marked');
+          updateCounter();
+        };
+
+        grid.appendChild(cell);
+      });
+    }
+
+    function updateCounter() {
+      const markedCount = document.querySelectorAll('.cell.marked').length;
+      if (markedCount === 0) counter.innerText = 'Nenhum marcado';
+      else if (markedCount === 1) counter.innerText = '1 marcado';
+      else counter.innerText = `${markedCount} marcados`;
+    }
+
+    // Gerenciar toggle do painel lateral das cores
+    document.querySelectorAll('.color-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        const isOpen = target.classList.contains('open');
+
+        // Fecha todos
+        document.querySelectorAll('.color-options').forEach(opt => opt.classList.remove('open'));
+
+        // Abre ou fecha o clicado
+        if (!isOpen) target.classList.add('open');
+      });
+    });
+
+    // Alterar as cores do site ao clicar nas bolas
+    document.querySelectorAll('.color-ball').forEach(ball => {
+      ball.addEventListener('click', () => {
+        const color = ball.dataset.color;
+
+        // Define a variável CSS correta baseado no pai
+        const parentId = ball.parentElement.id;
+
+        // Remove seleção anterior no grupo
+        ball.parentElement.querySelectorAll('.color-ball').forEach(b => b.classList.remove('selected'));
+
+        ball.classList.add('selected');
+
+        if (parentId === 'bgColors') {
+          document.documentElement.style.setProperty('--bg-color', color);
+        } else if (parentId === 'titleColors') {
+          document.documentElement.style.setProperty('--title-color', color);
+          document.documentElement.style.setProperty('--cell-hover', color);
+          document.documentElement.style.setProperty('--cell-marked', shadeColor(color, -30));
+        } else if (parentId === 'cellColors') {
+          document.documentElement.style.setProperty('--cell-bg', color);
+        }
+      });
+    });
+
+    // Função para escurecer uma cor em HEX (para criar variação mais escura)
+    function shadeColor(color, percent) {
+      let R = parseInt(color.substring(1,3),16);
+      let G = parseInt(color.substring(3,5),16);
+      let B = parseInt(color.substring(5,7),16);
+
+      R = parseInt(R * (100 + percent) / 100);
+      G = parseInt(G * (100 + percent) / 100);
+      B = parseInt(B * (100 + percent) / 100);
+
+      R = (R<255)?R:255;
+      G = (G<255)?G:255;
+      B = (B<255)?B:255;
+
+      const RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+      const GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+      const BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+      return "#"+RR+GG+BB;
+    }
+  </script>
 </body>
 </html>
