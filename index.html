@@ -1,276 +1,293 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NeuroBingo</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Inter&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroBingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=IM+Fell+DW+Pica&family=Inter&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg-light: #fefcf7;
+    --color-text-light: #2e2b27;
+    --color-title-light: #8b4000;
+    --color-cell-bg-light: #fefcf7;
+    --color-cell-hover-light: #b35c00;
+    --color-cell-marked-light: #7a3e00;
 
-    :root {
-      --color-bg-light: #fefcf7;
-      --color-text-light: #2e2b27;
-      --color-title-light: #b35c00;
-      --color-cell-bg-light: #fefcf7;
-      --color-cell-hover-light: #b35c00;
-      --color-cell-marked-light: #7a3e00;
+    --color-bg-dark: #1a1612;
+    --color-text-dark: #e4dcd1;
+    --color-title-dark: #f4a261;
+    --color-cell-bg-dark: rgba(40,35,30,0.7);
+    --color-cell-hover-dark: #f4a261;
+    --color-cell-marked-dark: #e76f51;
+  }
 
-      --color-bg-dark: #1b1a17;
-      --color-text-dark: #f0e9db;
-      --color-title-dark: #f4a261;
-      --color-cell-bg-dark: #2c2b28;
-      --color-cell-hover-dark: #f4a261;
-      --color-cell-marked-dark: #e76f51;
-    }
+  body {
+    margin:0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-bg-light);
+    color: var(--color-text-light);
+    transition: background 0.5s, color 0.5s;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:30px 20px;
+    min-height:100vh;
+    background-image: none;
+  }
 
-    /* Tema Light padrão */
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--color-bg-light);
-      color: var(--color-text-light);
-      transition: background-color 0.3s, color 0.3s;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px 20px;
-    }
+  body.dark {
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-dark);
+    background-image: url('https://i.ibb.co/4NqQZgF/victorian-dark-bg.jpg');
+    background-size: cover;
+    background-position: center;
+  }
 
-    body.dark {
-      background-color: var(--color-bg-dark);
-      color: var(--color-text-dark);
-    }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    margin:0 0 5px 0;
+    color: var(--color-title-light);
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    transition: color 0.5s;
+    user-select: none;
+  }
 
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      margin: 0 0 5px 0;
-      color: var(--color-title-light);
-      transition: color 0.3s;
-      user-select: none;
-    }
+  body.dark h1 {
+    color: var(--color-title-dark);
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+  }
 
-    body.dark h1 {
-      color: var(--color-title-dark);
-    }
+  .subtitle {
+    margin:0 0 25px 0;
+    font-family: 'IM Fell DW Pica', serif;
+    font-weight:400;
+    opacity:0.85;
+    user-select:none;
+    font-size:1.2rem;
+    transition: color 0.5s;
+    color: var(--color-text-light);
+  }
 
-    .subtitle {
-      margin: 0 0 25px 0;
-      font-weight: 600;
-      opacity: 0.8;
-      user-select: none;
-      transition: color 0.3s;
-      color: var(--color-text-light);
-    }
+  body.dark .subtitle {
+    color: var(--color-text-dark);
+  }
 
-    body.dark .subtitle {
-      color: var(--color-text-dark);
-    }
+  textarea {
+    width:100%;
+    max-width:700px;
+    height:140px;
+    padding:12px 15px;
+    font-size:1rem;
+    border-radius:10px;
+    border:2px solid var(--color-title-light);
+    background-color: var(--color-cell-bg-light);
+    color: var(--color-text-light);
+    resize: vertical;
+    box-sizing: border-box;
+    transition: background 0.5s, color 0.5s, border-color 0.5s;
+    font-family: 'Inter', sans-serif;
+  }
 
-    textarea {
-      width: 100%;
-      max-width: 700px;
-      height: 140px;
-      padding: 12px 15px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 2px solid var(--color-title-light);
-      background-color: var(--color-cell-bg-light);
-      color: var(--color-text-light);
-      resize: vertical;
-      box-sizing: border-box;
-      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    }
+  body.dark textarea {
+    background-color: var(--color-cell-bg-dark);
+    color: var(--color-text-dark);
+    border-color: var(--color-title-dark);
+    backdrop-filter: blur(2px);
+  }
 
-    body.dark textarea {
-      background-color: var(--color-cell-bg-dark);
-      color: var(--color-text-dark);
-      border-color: var(--color-title-dark);
-    }
+  button {
+    margin-top:15px;
+    background-color: var(--color-title-light);
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:12px 28px;
+    font-size:1rem;
+    cursor:pointer;
+    transition: all 0.3s ease;
+    max-width:700px;
+    width:100%;
+    font-family: 'Playfair Display', serif;
+  }
 
-    button {
-      margin-top: 15px;
-      background-color: var(--color-title-light);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 28px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      max-width: 700px;
-      width: 100%;
-      user-select: none;
-    }
+  button:hover {
+    transform: translateY(-2px);
+    background-color: var(--color-cell-marked-light);
+  }
 
-    button:hover {
-      background-color: var(--color-cell-marked-light);
-    }
+  body.dark button {
+    background-color: var(--color-title-dark);
+  }
 
-    body.dark button {
-      background-color: var(--color-title-dark);
-    }
+  body.dark button:hover {
+    background-color: var(--color-cell-marked-dark);
+  }
 
-    body.dark button:hover {
-      background-color: var(--color-cell-marked-dark);
-    }
+  .grid {
+    margin-top:30px;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap:15px;
+    width:100%;
+    max-width:700px;
+    opacity:0;
+    transition: opacity 0.5s;
+  }
 
-    .grid {
-      margin-top: 30px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
-      width: 100%;
-      max-width: 700px;
-    }
+  .grid.show {
+    opacity:1;
+  }
 
-    .cell {
-      background-color: var(--color-cell-bg-light);
-      border: 2px solid var(--color-title-light);
-      padding: 14px 10px;
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      font-weight: 600;
-      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .cell {
+    background-color: var(--color-cell-bg-light);
+    border:2px solid var(--color-title-light);
+    padding:14px 10px;
+    border-radius:12px;
+    text-align:center;
+    cursor:pointer;
+    user-select:none;
+    font-weight:600;
+    transition: all 0.3s ease;
+    min-height:50px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform: translateY(0);
+  }
 
-    .cell:hover {
-      background-color: var(--color-cell-hover-light);
-      color: white;
-      border-color: var(--color-cell-hover-light);
-    }
+  .cell:hover {
+    background-color: var(--color-cell-hover-light);
+    color:white;
+    border-color: var(--color-cell-hover-light);
+    transform: translateY(-3px);
+  }
 
-    .cell.marked {
-      background-color: var(--color-cell-marked-light);
-      color: white;
-      border-color: var(--color-cell-marked-light);
-    }
+  .cell.marked {
+    background-color: var(--color-cell-marked-light);
+    color:white;
+    border-color: var(--color-cell-marked-light);
+    transform: scale(1.05);
+  }
 
-    body.dark .cell {
-      background-color: var(--color-cell-bg-dark);
-      border-color: var(--color-title-dark);
-      color: var(--color-text-dark);
-    }
+  body.dark .cell {
+    background-color: var(--color-cell-bg-dark);
+    border-color: var(--color-title-dark);
+    color: var(--color-text-dark);
+  }
 
-    body.dark .cell:hover {
-      background-color: var(--color-cell-hover-dark);
-      color: white;
-      border-color: var(--color-cell-hover-dark);
-    }
+  body.dark .cell:hover {
+    background-color: var(--color-cell-hover-dark);
+    color:white;
+    border-color: var(--color-cell-hover-dark);
+    transform: translateY(-3px);
+  }
 
-    body.dark .cell.marked {
-      background-color: var(--color-cell-marked-dark);
-      color: white;
-      border-color: var(--color-cell-marked-dark);
-    }
+  body.dark .cell.marked {
+    background-color: var(--color-cell-marked-dark);
+    color:white;
+    border-color: var(--color-cell-marked-dark);
+    transform: scale(1.05);
+  }
 
-    #counter {
-      margin-top: 18px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      user-select: none;
-      max-width: 700px;
-      width: 100%;
-      color: var(--color-title-light);
-      transition: color 0.3s;
-    }
+  #counter {
+    margin-top:18px;
+    font-weight:700;
+    font-size:1.2rem;
+    user-select:none;
+    max-width:700px;
+    width:100%;
+    color: var(--color-title-light);
+    transition: color 0.5s;
+    text-align:center;
+  }
 
-    body.dark #counter {
-      color: var(--color-title-dark);
-    }
+  body.dark #counter {
+    color: var(--color-title-dark);
+  }
 
-    /* Botão do tema no canto superior direito */
-    #toggleTheme {
-      position: fixed;
-      top: 18px;
-      right: 18px;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 24px;
-      color: var(--color-title-light);
-      transition: color 0.3s;
-      user-select: none;
-      z-index: 100;
-    }
+  #toggleTheme {
+    position: fixed;
+    top:18px;
+    right:18px;
+    background-color: transparent;
+    border:none;
+    cursor:pointer;
+    font-size:28px;
+    color: var(--color-title-light);
+    transition: color 0.5s, transform 0.3s;
+    user-select:none;
+    z-index:100;
+  }
 
-    body.dark #toggleTheme {
-      color: var(--color-title-dark);
-    }
+  body.dark #toggleTheme {
+    color: var(--color-title-dark);
+  }
 
-  </style>
+  #toggleTheme:hover {
+    transform: rotate(20deg);
+  }
+
+</style>
 </head>
 <body>
-  <button id="toggleTheme" title="Alternar modo claro/escuro" aria-label="Alternar tema">
-    ☀️
-  </button>
+<button id="toggleTheme" title="Alternar tema" aria-label="Alternar tema">☀️</button>
 
-  <h1>NeuroBingo</h1>
-  <p class="subtitle">O NEUROBINGO ESTÁ DE VOLTA</p>
+<h1>NeuroBingo</h1>
+<p class="subtitle">O NEUROBINGO ESTÁ DE VOLTA</p>
 
-  <textarea id="input" placeholder="Escreva um item por linha..."></textarea>
-  <button onclick="generateBingo()">Gerar Bingo</button>
+<textarea id="input" placeholder="Escreva um item por linha..."></textarea>
+<button onclick="generateBingo()">Gerar Bingo</button>
 
-  <div class="grid" id="grid"></div>
+<div class="grid" id="grid"></div>
+<div id="counter">Nenhum marcado</div>
 
-  <div id="counter">Nenhum marcado</div>
+<script>
+const body = document.body;
+const toggleThemeBtn = document.getElementById('toggleTheme');
+const grid = document.getElementById('grid');
+const counter = document.getElementById('counter');
+const input = document.getElementById('input');
 
-  <script>
-    const body = document.body;
-    const toggleThemeBtn = document.getElementById('toggleTheme');
-    const grid = document.getElementById('grid');
-    const counter = document.getElementById('counter');
-    const input = document.getElementById('input');
+// Carrega tema salvo
+if(localStorage.getItem('theme')==='dark'){
+  body.classList.add('dark');
+  toggleThemeBtn.textContent='🌙';
+}
 
-    // Inicializa tema salvo no localStorage, ou padrão claro
-    if(localStorage.getItem('theme') === 'dark') {
-      body.classList.add('dark');
-      toggleThemeBtn.textContent = '🌙';
-    }
+toggleThemeBtn.addEventListener('click', ()=>{
+  body.classList.toggle('dark');
+  const isDark = body.classList.contains('dark');
+  toggleThemeBtn.textContent=isDark?'🌙':'☀️';
+  localStorage.setItem('theme', isDark?'dark':'light');
+});
 
-    toggleThemeBtn.addEventListener('click', () => {
-      body.classList.toggle('dark');
-      const isDark = body.classList.contains('dark');
-      toggleThemeBtn.textContent = isDark ? '🌙' : '☀️';
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
+function generateBingo(){
+  grid.innerHTML='';
+  counter.innerText='Nenhum marcado';
+  const text=input.value.trim();
+  if(!text) return;
+  const items=text.split('\n').filter(l=>l.trim()!=='');
+  items.forEach(name=>{
+    const cell=document.createElement('div');
+    cell.className='cell';
+    cell.innerText=name;
+    cell.onclick=()=>{
+      cell.classList.toggle('marked');
+      updateCounter();
+    };
+    grid.appendChild(cell);
+  });
+  setTimeout(()=>grid.classList.add('show'),10); // animação fade-in
+}
 
-    function generateBingo() {
-      grid.innerHTML = '';
-      counter.innerText = 'Nenhum marcado';
-
-      const text = input.value.trim();
-      if (!text) return;
-
-      const items = text.split('\n').filter(line => line.trim() !== '');
-
-      items.forEach(name => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.innerText = name;
-
-        cell.onclick = () => {
-          cell.classList.toggle('marked');
-          updateCounter();
-        };
-
-        grid.appendChild(cell);
-      });
-    }
-
-    function updateCounter() {
-      const markedCount = document.querySelectorAll('.cell.marked').length;
-      if (markedCount === 0) counter.innerText = 'Nenhum marcado';
-      else if (markedCount === 1) counter.innerText = '1 marcado';
-      else counter.innerText = `${markedCount} marcados`;
-    }
-  </script>
+function updateCounter(){
+  const markedCount=document.querySelectorAll('.cell.marked').length;
+  if(markedCount===0) counter.innerText='Nenhum marcado';
+  else if(markedCount===1) counter.innerText='1 marcado';
+  else counter.innerText=`${markedCount} marcados`;
+}
+</script>
 </body>
 </html>
