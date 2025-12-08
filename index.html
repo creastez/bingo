@@ -6,36 +6,59 @@
 <title>NeuroBingo</title>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:wght@400;600&display=swap');
+
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
+    font-family: 'Playfair Display', serif;
+    background: var(--bg);
+    color: var(--text);
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: 0.6s ease;
   }
 
   h1 {
     margin-bottom: 10px;
+    font-family: 'Cinzel', serif;
+    color: var(--accent);
+    text-shadow: 0 0 8px var(--shadow);
   }
 
-  /* Seleção do grid */
-  .grid-selector {
-    margin-bottom: 20px;
+  .grid-selector label {
+    font-size: 0.9rem;
+    opacity: 0.8;
   }
+
   select {
     padding: 10px;
     font-size: 1rem;
+    border-radius: 6px;
+    border: 2px solid var(--accent);
+    background: var(--bg2);
+    color: var(--text);
+    transition: 0.3s;
   }
 
-  /* Botão editar */
+  select:focus {
+    outline: none;
+    border-color: var(--accent2);
+  }
+
   #edit-btn {
     font-size: 1.5rem;
     background: none;
     border: none;
     cursor: pointer;
-    margin-bottom: 15px;
+    margin: 15px 0;
+    color: var(--accent);
+    transition: 0.3s;
+  }
+  #edit-btn:hover {
+    transform: scale(1.2);
+    color: var(--accent2);
   }
 
   /* GRID */
@@ -47,35 +70,145 @@
   }
 
   .cell {
-    background: #d87c38;
-    color: white;
+    background: var(--cell);
+    color: var(--cell-text);
     display: flex;
     justify-content: center;
     align-items: center;
-    aspect-ratio: 1 / 1;   /* 🔥 garante quadrado */
+    aspect-ratio: 1 / 1;
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
     padding: 5px;
     text-align: center;
+    transition: 0.3s ease;
+    border: 1px solid var(--cell-border);
   }
 
-  /* Marcado */
+  .cell:hover {
+    filter: brightness(1.15);
+  }
+
   .cell.marked {
-    background: #222;
+    background: var(--marked);
+    color: var(--marked-text);
     text-decoration: line-through;
+    border-color: var(--marked-border);
   }
 
-  /* Editando */
-  .editing .cell {
-    cursor: text;
-    background: #c06f2f;
+  /* TEMA SELECTOR */
+  .theme-picker {
+    position: fixed;
+    right: 30px;
+    top: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .theme-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    transition: 0.2s;
+  }
+
+  .theme-dot:hover {
+    transform: scale(1.2);
+  }
+
+
+  /* ==============================
+     TEMAS BLOODBORNE-INSPIRED
+     ============================== */
+
+  /* PALE MOON (tema claro acinzentado) */
+  .theme-pale {
+    --bg: #e5e5e5;
+    --bg2: #dcdcdc;
+    --text: #2a2a2a;
+    --accent: #3b3b3b;
+    --accent2: #000;
+    --shadow: #888;
+    --cell: #b7b7b7;
+    --cell-text: #1a1a1a;
+    --cell-border: #777;
+    --marked: #2a2a2a;
+    --marked-text: #fff;
+    --marked-border: #000;
+  }
+
+  /* BLOOD RED (tema gótico vermelho) */
+  .theme-blood {
+    --bg: #1b0d0d;
+    --bg2: #2a1414;
+    --text: #f2d4d4;
+    --accent: #b21b1b;
+    --accent2: #e03131;
+    --shadow: #5c0000;
+    --cell: #7d2424;
+    --cell-text: #ffeaea;
+    --cell-border: #3d0e0e;
+    --marked: #2a0000;
+    --marked-text: #ffb5b5;
+    --marked-border: #b21b1b;
+  }
+
+  /* HUNTER BLACK (tema hunter do Bloodborne) */
+  .theme-hunter {
+    --bg: #0e0e10;
+    --bg2: #1c1c20;
+    --text: #d7d7d7;
+    --accent: #8b8365;
+    --accent2: #cabf9f;
+    --shadow: #000;
+    --cell: #3a3a3c;
+    --cell-text: #e5e5e5;
+    --cell-border: #2a2a2c;
+    --marked: #141415;
+    --marked-text: #c9c9c9;
+    --marked-border: #5c5440;
+  }
+
+  /* OLD GOLD (tema amarelo queimado antigo) */
+  .theme-gold {
+    --bg: #1d1914;
+    --bg2: #2a2520;
+    --text: #e8d8b8;
+    --accent: #c9a96a;
+    --accent2: #ffdf8f;
+    --shadow: #896c33;
+    --cell: #a88344;
+    --cell-text: #fff4dc;
+    --cell-border: #6a4f25;
+    --marked: #4d3618;
+    --marked-text: #ffe7b5;
+    --marked-border: #c9a96a;
+  }
+
+  /* MOONLIT BLUE (tema azul noite fria) */
+  .theme-moon {
+    --bg: #0b1018;
+    --bg2: #131b27;
+    --text: #d8e4ff;
+    --accent: #6fa8ff;
+    --accent2: #9fcbff;
+    --shadow: #3d5a84;
+    --cell: #2a3b57;
+    --cell-text: #e6eaff;
+    --cell-border: #1a2636;
+    --marked: #0f1826;
+    --marked-text: #aecdff;
+    --marked-border: #6fa8ff;
   }
 </style>
 </head>
 
-<body>
+<body class="theme-hunter"> <!-- Tema inicial -->
 
 <h1>NeuroBingo</h1>
 
@@ -93,14 +226,24 @@
   </select>
 </div>
 
-<button id="edit-btn" title="Editar o conteúdo das células">🖉</button>
+<button id="edit-btn" title="Editar">🖉</button>
 
 <div id="grid"></div>
+
+<!-- PALETA DE TEMAS -->
+<div class="theme-picker">
+  <div class="theme-dot" data-theme="theme-pale" style="background:#d7d7d7"></div>
+  <div class="theme-dot" data-theme="theme-blood" style="background:#b21b1b"></div>
+  <div class="theme-dot" data-theme="theme-hunter" style="background:#3a3a3c"></div>
+  <div class="theme-dot" data-theme="theme-gold" style="background:#c9a96a"></div>
+  <div class="theme-dot" data-theme="theme-moon" style="background:#2a3b57"></div>
+</div>
 
 <script>
   const grid = document.getElementById("grid");
   const gridSizeSelector = document.getElementById("grid-size");
   const editBtn = document.getElementById("edit-btn");
+  const themeDots = document.querySelectorAll(".theme-dot");
 
   let editing = false;
 
@@ -123,7 +266,7 @@
 
       cell.addEventListener("click", () => {
         if (editing) {
-          let newText = prompt("Digite o novo texto da célula:", cell.textContent);
+          let newText = prompt("Digite o novo texto:", cell.textContent);
           if (newText !== null) cell.textContent = newText;
         } else {
           cell.classList.toggle("marked");
@@ -134,12 +277,18 @@
     }
   }
 
-  // Sempre que mudar o tamanho do grid, gerar nova tabela
+  // troca de tema
+  themeDots.forEach(dot => {
+    dot.addEventListener("click", () => {
+      document.body.className = dot.dataset.theme;
+    });
+  });
+
   gridSizeSelector.addEventListener("change", () => {
     generateGrid(parseInt(gridSizeSelector.value));
   });
 
-  generateGrid(3); // padrão de início
+  generateGrid(8); // padrão inicial
 </script>
 
 </body>
