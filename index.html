@@ -4,144 +4,142 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>NeuroBingo</title>
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display&display=swap');
-
-  :root {
-    --orange: #d87c38;
-    --orange-light: #f4b183;
-    --gray-light: #f0e6df;
-    --gray-dark: #22201c;
-    --text-dark: #d4c6b9;
-    --text-light: #333;
-  }
-
-  * { box-sizing: border-box; }
-
   body {
     margin: 0;
-    font-family: 'Playfair Display', serif;
-    background: var(--gray-light);
-    color: var(--text-light);
-    padding: 2rem 1rem 4rem;
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: 0.7s ease;
-  }
-
-  header {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    position: relative;
   }
 
   h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 3rem;
-    margin: 0;
-    color: var(--orange);
+    margin-bottom: 10px;
   }
 
-  textarea {
-    width: 100%;
-    max-width: 600px;
-    height: 120px;
-    padding: 1rem;
-    border: 2px solid var(--orange);
-    border-radius: 10px;
-    resize: vertical;
-    font-size: 1.1rem;
+  /* Seleção do grid */
+  .grid-selector {
+    margin-bottom: 20px;
+  }
+  select {
+    padding: 10px;
+    font-size: 1rem;
   }
 
-  button {
-    margin-top: 1rem;
-    background: var(--orange);
-    color: white;
+  /* Botão editar */
+  #edit-btn {
+    font-size: 1.5rem;
+    background: none;
     border: none;
-    padding: 0.9rem 2rem;
-    font-size: 1.2rem;
-    border-radius: 12px;
     cursor: pointer;
+    margin-bottom: 15px;
   }
 
-  /* 📌 GRID VERDADEIRAMENTE RESPONSIVO */
+  /* GRID */
   #grid {
-    margin-top: 2rem;
-    width: 100%;
-    /* 🔥 Sem max-width! Agora usa a tela TODA */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
+    gap: 6px;
+    width: 90vw;
+    max-width: 600px;
   }
 
   .cell {
-    background: var(--orange);
+    background: #d87c38;
     color: white;
-    padding: 0.8rem;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;   /* 🔥 garante quadrado */
+    border-radius: 6px;
+    font-weight: bold;
     cursor: pointer;
     user-select: none;
+    padding: 5px;
+    text-align: center;
   }
 
+  /* Marcado */
   .cell.marked {
-    background: var(--gray-dark);
-    color: var(--orange);
+    background: #222;
     text-decoration: line-through;
+  }
+
+  /* Editando */
+  .editing .cell {
+    cursor: text;
+    background: #c06f2f;
   }
 </style>
 </head>
 
 <body>
-<header>
-  <h1>NeuroBingo</h1>
-</header>
 
-<textarea id="input-names" placeholder="Digite os nomes para o bingo, um por linha..."></textarea>
-<button id="generate">Gerar Bingo</button>
+<h1>NeuroBingo</h1>
+
+<div class="grid-selector">
+  <label>Escolha o tamanho do grid:</label><br>
+  <select id="grid-size">
+    <option value="3">3 x 3</option>
+    <option value="4">4 x 4</option>
+    <option value="5">5 x 5</option>
+    <option value="6">6 x 6</option>
+    <option value="7">7 x 7</option>
+    <option value="8">8 x 8</option>
+    <option value="9">9 x 9</option>
+    <option value="10">10 x 10</option>
+  </select>
+</div>
+
+<button id="edit-btn" title="Editar o conteúdo das células">🖉</button>
 
 <div id="grid"></div>
 
 <script>
-  const input = document.getElementById('input-names');
-  const generateBtn = document.getElementById('generate');
-  const grid = document.getElementById('grid');
+  const grid = document.getElementById("grid");
+  const gridSizeSelector = document.getElementById("grid-size");
+  const editBtn = document.getElementById("edit-btn");
 
-  generateBtn.addEventListener('click', () => {
-    grid.innerHTML = '';
-    let names = input.value.split('\n').map(n => n.trim()).filter(n => n);
+  let editing = false;
 
-    if (!names.length) {
-      alert('Digite pelo menos um nome!');
-      return;
-    }
+  editBtn.addEventListener("click", () => {
+    editing = !editing;
+    document.body.classList.toggle("editing", editing);
+    editBtn.style.opacity = editing ? "1" : "0.5";
+  });
 
-    names = shuffle(names);
+  function generateGrid(size) {
+    grid.innerHTML = "";
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
 
-    for (let name of names) {
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      cell.textContent = name;
+    const amount = size * size;
 
-      cell.addEventListener('click', () => {
-        cell.classList.toggle('marked');
+    for (let i = 0; i < amount; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = "";
+
+      cell.addEventListener("click", () => {
+        if (editing) {
+          let newText = prompt("Digite o novo texto da célula:", cell.textContent);
+          if (newText !== null) cell.textContent = newText;
+        } else {
+          cell.classList.toggle("marked");
+        }
       });
 
       grid.appendChild(cell);
     }
+  }
+
+  // Sempre que mudar o tamanho do grid, gerar nova tabela
+  gridSizeSelector.addEventListener("change", () => {
+    generateGrid(parseInt(gridSizeSelector.value));
   });
 
-  function shuffle(array) {
-    let m = array.length, i;
-    while (m) {
-      i = Math.floor(Math.random() * m--);
-      [array[m], array[i]] = [array[i], array[m]];
-    }
-    return array;
-  }
+  generateGrid(3); // padrão de início
 </script>
 
 </body>
