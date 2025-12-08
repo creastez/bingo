@@ -100,14 +100,8 @@
     user-select: none;
   }
 
-  button:hover {
-    background-color: var(--accent-dark);
-    transform: scale(1.05);
-  }
-
-  button:active {
-    transform: scale(0.97);
-  }
+  button:hover { background-color: var(--accent-dark); transform: scale(1.05); }
+  button:active { transform: scale(0.97); }
 
   .grid {
     margin-top: 40px;
@@ -129,64 +123,25 @@
     text-align: center;
     cursor: pointer;
     user-select: none;
-    box-shadow:
-      0 0 6px rgba(180,110,20,0.15),
-      inset 0 0 6px rgba(180,110,20,0.1);
+    box-shadow: 0 0 6px rgba(180,110,20,0.15), inset 0 0 6px rgba(180,110,20,0.1);
     transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
   }
 
-  body.dark .cell {
-    background-color: #2c2b28;
-    color: var(--text-light);
-    border-color: var(--accent);
-  }
+  body.dark .cell { background-color: #2c2b28; color: var(--text-light); border-color: var(--accent); }
+  .cell:hover { background-color: var(--accent); color: var(--text-light); transform: scale(1.05); }
+  .cell.marked { background-color: var(--accent-dark); color: var(--text-light); border-color: var(--accent-dark); font-weight: 700; transform: scale(1.1); }
 
-  .cell:hover {
-    background-color: var(--accent);
-    color: var(--text-light);
-    transform: scale(1.05);
-    box-shadow: 0 0 14px var(--accent), inset 0 0 10px var(--accent);
-  }
+  #counter { margin-top: 15px; font-weight: 600; color: var(--accent-dark); user-select: none; }
 
-  .cell.marked {
-    background-color: var(--accent-dark);
-    color: var(--text-light);
-    border-color: var(--accent-dark);
-    font-weight: 700;
-    transform: scale(1.1);
-    box-shadow: 0 0 20px var(--accent-dark), inset 0 0 12px var(--accent-dark);
-  }
-
-  #counter {
-    margin-top: 15px;
-    font-weight: 600;
-    color: var(--accent-dark);
-    user-select: none;
-  }
-
-  /* Volume e dark mode */
-  .controls {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-family: var(--font-body);
-  }
-
-  .controls input[type="range"] {
-    cursor: pointer;
-  }
+  .controls { margin-top: 15px; display: flex; align-items: center; gap: 12px; font-family: var(--font-body); }
+  .controls input[type="range"] { cursor: pointer; }
 </style>
 </head>
 <body>
   <h1>NeuroBingo</h1>
   <p class="subtitle">O NEUROBINGO ESTÁ DE VOLTA</p>
 
-  <textarea id="input" placeholder="Escreva um item por linha, ex:
-Melhor Direção de Arte
-Melhor Trilha Sonora
-Melhor Atuação
-..."></textarea>
+  <textarea id="input" placeholder="Escreva um item por linha..."></textarea>
 
   <div class="controls">
     <button onclick="generateBingo()">Gerar Bingo</button>
@@ -197,20 +152,16 @@ Melhor Atuação
   <div class="grid" id="grid"></div>
   <div id="counter">Nenhum marcado</div>
 
-<audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
 
 <script>
   const clickSound = document.getElementById('clickSound');
   const volumeSlider = document.getElementById('volumeSlider');
   clickSound.volume = volumeSlider.value;
 
-  volumeSlider.addEventListener('input', () => {
-    clickSound.volume = volumeSlider.value;
-  });
+  volumeSlider.addEventListener('input', () => { clickSound.volume = volumeSlider.value; });
 
-  function toggleTheme() {
-    document.body.classList.toggle('dark');
-  }
+  function toggleTheme() { document.body.classList.toggle('dark'); }
 
   function generateBingo() {
     const grid = document.getElementById('grid');
