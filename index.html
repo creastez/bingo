@@ -16,181 +16,81 @@
     --text-light: #333;
   }
 
-  /* Reset */
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
+
   body {
     margin: 0;
     font-family: 'Playfair Display', serif;
-    background-color: var(--gray-light);
+    background: var(--gray-light);
     color: var(--text-light);
-    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem 1rem 4rem;
-    transition: background-color 0.7s ease, color 0.7s ease;
+    transition: 0.7s ease;
   }
 
   header {
     width: 100%;
-    max-width: 700px;
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     position: relative;
   }
 
   h1 {
     font-family: 'Cinzel', serif;
-    font-weight: 700;
     font-size: 3rem;
-    color: var(--orange);
     margin: 0;
-    text-shadow: 0 0 5px #9e6b2b;
-  }
-
-  h2 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 500;
-    color: var(--orange-light);
-    margin-top: 0.3rem;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    text-shadow: 0 0 3px #9e6b2b;
-  }
-
-  /* Toggle Dark Mode */
-  #toggle-theme {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    cursor: pointer;
     color: var(--orange);
-    transition: color 0.4s ease;
-  }
-  #toggle-theme:hover {
-    color: var(--orange-light);
   }
 
   textarea {
     width: 100%;
-    max-width: 700px;
+    max-width: 600px;
     height: 120px;
     padding: 1rem;
     border: 2px solid var(--orange);
     border-radius: 10px;
-    font-size: 1.1rem;
-    font-family: 'Playfair Display', serif;
     resize: vertical;
-    color: var(--text-light);
-    background-color: var(--gray-light);
-    box-shadow: 0 0 15px var(--orange-light);
-    transition: background-color 0.5s ease, color 0.5s ease;
-  }
-
-  textarea::placeholder {
-    color: #c68e59;
+    font-size: 1.1rem;
   }
 
   button {
     margin-top: 1rem;
-    background-color: var(--orange);
-    color: #fff;
+    background: var(--orange);
+    color: white;
     border: none;
     padding: 0.9rem 2rem;
     font-size: 1.2rem;
-    font-family: 'Cinzel', serif;
-    cursor: pointer;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(216, 124, 56, 0.6);
-    transition: background-color 0.3s ease;
-  }
-  button:hover {
-    background-color: var(--orange-light);
+    cursor: pointer;
   }
 
-  /* 📌 GRID RESPONSIVO */
+  /* 📌 GRID VERDADEIRAMENTE RESPONSIVO */
   #grid {
     margin-top: 2rem;
     width: 100%;
-    max-width: 900px; /* permite mais colunas */
+    /* 🔥 Sem max-width! Agora usa a tela TODA */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
   }
 
   .cell {
-    background-color: var(--orange);
-    color: #fff;
+    background: var(--orange);
+    color: white;
+    padding: 0.8rem;
     border-radius: 8px;
-    padding: 0.8rem 1rem;
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    font-size: 1rem;
     text-align: center;
+    font-weight: 600;
     cursor: pointer;
     user-select: none;
-    box-shadow: 0 0 10px #c67438;
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .cell.marked {
-    background-color: var(--gray-dark);
+    background: var(--gray-dark);
     color: var(--orange);
     text-decoration: line-through;
-    box-shadow: none;
-  }
-
-  #marked-count {
-    margin-top: 1.5rem;
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--orange);
-    text-align: center;
-    user-select: none;
-  }
-
-  /* DARK MODE */
-  body.dark {
-    background-color: var(--gray-dark);
-    color: var(--text-dark);
-  }
-  body.dark textarea {
-    background-color: #3a342e;
-    color: var(--text-dark);
-    border-color: var(--orange-light);
-    box-shadow: 0 0 15px var(--orange);
-  }
-  body.dark button {
-    background-color: var(--orange-light);
-    box-shadow: 0 4px 8px rgba(244, 177, 131, 0.7);
-    color: var(--gray-dark);
-  }
-  body.dark button:hover {
-    background-color: var(--orange);
-    color: #fff;
-  }
-  body.dark .cell {
-    background-color: var(--orange-light);
-    color: var(--gray-dark);
-    box-shadow: 0 0 10px #d3a06b;
-  }
-  body.dark .cell.marked {
-    background-color: var(--gray-light);
-    color: var(--orange-light);
-    text-decoration: line-through;
-    box-shadow: none;
-  }
-  body.dark #marked-count {
-    color: var(--orange-light);
-  }
-  body.dark #toggle-theme {
-    color: var(--orange-light);
   }
 </style>
 </head>
@@ -198,36 +98,23 @@
 <body>
 <header>
   <h1>NeuroBingo</h1>
-  <h2>O NEUROBINGO ESTÁ DE VOLTA</h2>
-  <button id="toggle-theme" aria-label="Alternar modo claro/escuro">🌙</button>
 </header>
 
 <textarea id="input-names" placeholder="Digite os nomes para o bingo, um por linha..."></textarea>
 <button id="generate">Gerar Bingo</button>
 
-<div id="grid" aria-live="polite"></div>
-<div id="marked-count">Nenhum marcado</div>
+<div id="grid"></div>
 
 <script>
-  const toggleBtn = document.getElementById('toggle-theme');
-  const body = document.body;
   const input = document.getElementById('input-names');
   const generateBtn = document.getElementById('generate');
   const grid = document.getElementById('grid');
-  const markedCount = document.getElementById('marked-count');
 
-  // Alterna tema claro/escuro
-  toggleBtn.addEventListener('click', () => {
-    body.classList.toggle('dark');
-    toggleBtn.textContent = body.classList.contains('dark') ? '☀️' : '🌙';
-  });
-
-  // Gera o bingo
   generateBtn.addEventListener('click', () => {
     grid.innerHTML = '';
-    let names = input.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+    let names = input.value.split('\n').map(n => n.trim()).filter(n => n);
 
-    if (names.length === 0) {
+    if (!names.length) {
       alert('Digite pelo menos um nome!');
       return;
     }
@@ -238,51 +125,20 @@
       const cell = document.createElement('div');
       cell.classList.add('cell');
       cell.textContent = name;
-      cell.tabIndex = 0;
 
-      cell.addEventListener('click', () => toggleMarked(cell));
-      cell.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleMarked(cell);
-        }
+      cell.addEventListener('click', () => {
+        cell.classList.toggle('marked');
       });
 
       grid.appendChild(cell);
     }
-
-    updateMarkedCount();
   });
 
-  function toggleMarked(cell) {
-    cell.classList.toggle('marked');
-    updateMarkedCount();
-  }
-
-  function updateMarkedCount() {
-    const marked = grid.querySelectorAll('.marked').length;
-    const total = grid.children.length;
-
-    if (total === 0) {
-      markedCount.textContent = '';
-      return;
-    }
-    if (marked === 0) {
-      markedCount.textContent = 'Nenhum marcado';
-    } else if (marked === total) {
-      markedCount.textContent = 'Todos marcados!';
-    } else {
-      markedCount.textContent = `${marked} marcado${marked > 1 ? 's' : ''}`;
-    }
-  }
-
-  // Embaralha
   function shuffle(array) {
-    let currentIndex = array.length, randomIndex;
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    let m = array.length, i;
+    while (m) {
+      i = Math.floor(Math.random() * m--);
+      [array[m], array[i]] = [array[i], array[m]];
     }
     return array;
   }
