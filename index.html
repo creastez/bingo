@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Bingo Bloodborne</title>
+
+<style>
+    /* ===== ESTILO GLOBAL ===== */
+    :root {
+        --bg: #0d0d0d;
+        --bg2: #161616;
+        --card: #1d1d1d;
+        --border: #2b2b2b;
+        --text: #e2e2e2;
+        --accent: #7a0f14;        /* vinho profundo */
+        --accent-glow: #b8232c88; /* glow vermelho */
+        --font: 'Cinzel', serif;
+        --font-body: 'Inter', sans-serif;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500&display=swap');
+
+    body {
+        margin: 0;
+        padding: 40px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: linear-gradient(180deg, #0a0a0a, #111, #0a0a0a);
+        background-size: cover;
+        background-repeat: repeat;
+    }
+
+    h1 {
+        font-family: var(--font);
+        font-weight: 700;
+        font-size: 38px;
+        margin: 0;
+        letter-spacing: 2px;
+        color: #ddd;
+        text-shadow: 0 0 8px #000;
+    }
+
+    p {
+        margin: 10px 0 25px 0;
+        opacity: 0.7;
+        font-size: 14px;
+    }
+
+    /* ---- TEXTAREA ---- */
+    textarea {
+        width: 90%;
+        max-width: 600px;
+        height: 150px;
+        border-radius: 8px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 12px;
+        color: var(--text);
+        outline: none;
+        resize: vertical;
+        transition: 0.2s;
+        font-family: var(--font-body);
+        font-size: 15px;
+        box-shadow: inset 0 0 18px #000;
+    }
+
+    textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* ---- BOTÃO ---- */
+    button {
+        margin-top: 12px;
+        padding: 12px 28px;
+        font-size: 15px;
+        background: var(--accent);
+        border: none;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.25s ease;
+        font-family: var(--font-body);
+        font-weight: 500;
+        letter-spacing: 1px;
+        box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    button:hover {
+        background: #a1121a;
+        transform: translateY(-2px);
+        box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* ---- GRID ---- */
+    .grid {
+        display: grid;
+        gap: 12px;
+        margin-top: 35px;
+    }
+
+    /* ---- CELULAS ---- */
+    .cell {
+        width: 150px;
+        height: 90px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: inset 0 0 10px #000, 0 0 4px #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition: 0.2s;
+        font-size: 14px;
+    }
+
+    .cell:hover {
+        background: #242424;
+        border-color: #3d3d3d;
+    }
+
+    .cell.marked {
+        background: var(--accent);
+        border-color: #b8232c;
+        color: #fff;
+        font-weight: bold;
+        transform: scale(1.03);
+        box-shadow: 0 0 12px var(--accent-glow), inset 0 0 12px #000;
+    }
+</style>
+
+</head>
+
+<body>
+
+    <h1>BINGO BLOODBORNE</h1>
+    <p>Escreva um item por linha, gere seu bingo e cace os vencedores...</p>
+
+    <textarea id="input" placeholder="Exemplo:
+Best Art Direction
+Best Score
+Best Performance
+..."></textarea>
+
+    <br>
+    <button onclick="generateBingo()">Gerar Bingo</button>
+
+    <div class="grid" id="grid"></div>
+
+<script>
+function generateBingo() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    const text = document.getElementById("input").value.trim();
+    if (!text) return;
+
+    const items = text.split("\n").filter(line => line.trim() !== "");
+
+    // cria o grid quadrado
+    const size = Math.ceil(Math.sqrt(items.length));
+    grid.style.gridTemplateColumns = `repeat(${size}, 150px)`;
+
+    items.forEach(name => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.innerText = name;
+
+        cell.onclick = () => {
+            cell.classList.toggle("marked");
+        };
+
+        grid.appendChild(cell);
+    });
+}
+</script>
+
+</body>
+</html>
