@@ -1,0 +1,93 @@
+:root {
+  --bg-color: #fefcf7;
+  --title-color: #b35c00;
+  --cell-bg: #fefcf7;
+  --cell-hover: #b35c00;
+  --cell-marked: #7a3e00;
+  --text-color: #2e2b27;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.sidebar {
+  width: 220px;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+  background: #f2f2f2;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+}
+
+.color-picker {
+  margin-bottom: 15px;
+}
+
+.main {
+  flex: 1;
+  padding: 40px;
+}
+
+h1 {
+  color: var(--title-color);
+  font-size: 3rem;
+  font-family: 'Playfair Display', serif;
+}
+
+textarea {
+  width: 100%;
+  min-height: 150px;
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid var(--title-color);
+  font-size: 16px;
+}
+
+button {
+  padding: 12px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  background-color: var(--title-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-gap: 12px;
+}
+
+.cell {
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid var(--title-color);
+  background-color: var(--cell-bg);
+  text-align: center;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background-color: var(--cell-hover);
+  color: #fff;
+}
+
+.cell.marked {
+  background-color: var(--cell-marked);
+  color: #fff;
+}
+
+#counter {
+  margin-top: 15px;
+  font-weight: 600;
+}
