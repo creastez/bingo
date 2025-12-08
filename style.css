@@ -11,61 +11,131 @@ body {
   margin: 0;
   font-family: 'Inter', sans-serif;
   display: flex;
+  min-height: 100vh;
   background: var(--bg-color);
   color: var(--text-color);
 }
 
 .sidebar {
-  width: 220px;
+  width: 250px;
   padding: 20px;
   border-right: 1px solid #ccc;
   background: #f2f2f2;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-.sidebar h2 {
-  margin-top: 0;
-  font-size: 1.3rem;
+.color-section {
+  margin-bottom: 20px;
 }
 
-.color-picker {
-  margin-bottom: 15px;
+.color-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-align: left;
+  padding: 8px 0;
+  color: var(--title-color);
+  user-select: none;
+}
+
+.color-options {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 5px;
+}
+
+.color-options.open {
+  max-height: 150px;
+  margin-top: 10px;
+}
+
+.color-ball {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.color-ball:hover {
+  border-color: var(--title-color);
+}
+
+/* Indica a cor selecionada */
+.color-ball.selected {
+  border-color: var(--title-color);
+  box-shadow: 0 0 5px var(--title-color);
 }
 
 .main {
   flex: 1;
   padding: 40px;
+  box-sizing: border-box;
+  max-width: 900px;
+  margin: auto;
+}
+
+.title-group {
+  color: var(--title-color);
+  margin-bottom: 5px;
 }
 
 h1 {
-  color: var(--title-color);
   font-size: 3rem;
   font-family: 'Playfair Display', serif;
+  margin: 0;
+}
+
+.subtitle {
+  font-weight: 600;
+  margin: 4px 0 20px 0;
+  opacity: 0.7;
+  user-select: none;
 }
 
 textarea {
   width: 100%;
-  min-height: 150px;
-  margin: 15px 0;
+  min-height: 140px;
+  margin-bottom: 20px;
   padding: 10px;
   border-radius: 8px;
   border: 2px solid var(--title-color);
   font-size: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+  background: #fff; /* mantém sempre branco para melhor leitura */
+  color: #000;
 }
 
 button {
   padding: 12px 25px;
   font-size: 16px;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   background-color: var(--title-color);
   color: #fff;
   border: none;
   border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--cell-marked);
 }
 
 .grid {
   display: grid;
   grid-gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 
 .cell {
@@ -75,6 +145,8 @@ button {
   background-color: var(--cell-bg);
   text-align: center;
   cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .cell:hover {
@@ -88,6 +160,7 @@ button {
 }
 
 #counter {
-  margin-top: 15px;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.1rem;
+  user-select: none;
 }
