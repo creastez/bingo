@@ -3,29 +3,26 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NeuroBingo — Final Único</title>
+<title>NeuroBingo — Final (com salvar)</title>
 
-<!-- Fonts -->
+<!-- Fonts used by themes -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:wght@400;700&family=Orbitron:wght@400;700&family=Press+Start+2P&family=Noto+Serif:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --radius:10px; --gap:8px; --cell-size:92px;
-    /* default theme tokens (will be overridden by body.theme-*) */
-    --bg:#0b0b0b; --panel:#111111; --text:#e9e9ea; --accent:#b64b4b;
-    --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea;
-    --title-font:'Cinzel Decorative', serif; --body-font:'Inter',sans-serif;
+    --radius:10px; --gap:8px;
+    --default-cell-size:92px;
   }
 
-  /* Layout */
-  html,body{height:100%;margin:0;font-family:var(--body-font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  /* Base layout */
+  html,body{height:100%;margin:0;background:#0b0b0b;color:#e9e9ea;font-family:Inter,system-ui, -apple-system, 'Segoe UI', Roboto, Arial;}
   .wrap{max-width:1100px;margin:20px auto;padding:18px}
   header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  h1{font-family:var(--title-font);margin:0;color:var(--accent);font-size:28px}
-  .subtitle{font-size:13px;color:rgba(255,255,255,0.7);margin-top:4px}
+  h1{font-family:Cinzel Decorative,serif;margin:0;color:#b64b4b;font-size:28px}
+  .subtitle{font-size:13px;color:rgba(255,255,255,0.72);margin-top:4px}
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  select,textarea,input[type="text"]{background:var(--panel);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--text)}
-  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer;font-weight:600}
+  select,textarea,input[type="text"]{background:#111;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--text)}
+  button{background:#b64b4b;border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer;font-weight:600}
   button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
   .main{display:flex;gap:18px;margin-top:14px;align-items:flex-start}
   .board{flex:1;display:flex;flex-direction:column;gap:12px}
@@ -38,32 +35,37 @@
   .theme-btn{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
   .stats{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .stat{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;font-weight:600}
-  .badge{position:fixed;left:18px;bottom:18px;padding:10px 14px;border-radius:12px;background:var(--accent);color:#fff;display:none;z-index:9999}
+  .badge{position:fixed;left:18px;bottom:18px;padding:10px 14px;border-radius:12px;background:#b64b4b;color:#fff;display:none;z-index:9999}
   .toast{position:fixed;right:18px;bottom:18px;padding:10px 14px;border-radius:10px;background:rgba(0,0,0,0.6);color:#fff;display:none;z-index:9999}
   canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;z-index:9998}
   /* Victory modal */
   .overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;visibility:hidden;opacity:0;transition:all .25s}
   .overlay.show{visibility:visible;opacity:1}
-  .victory{background:linear-gradient(180deg,#111 0%, #1b0b0b 100%);padding:28px;border-radius:14px;color:#fff;max-width:720px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.7)}
-  .victory h2{margin:0 0 8px;font-size:32px}
+  .victory{background:linear-gradient(180deg,#111 0%, #1b0b0b 100%);padding:20px 28px;border-radius:14px;color:#fff;max-width:720px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.7)}
+  .victory h2{margin:0 0 8px;font-size:28px}
+  .victory p{margin:0 0 12px;color:rgba(255,255,255,0.85)}
   @media(max-width:980px){ .main{flex-direction:column} .sidebar{width:100%} .grid{padding:8px} }
 
-  /* ---------------- THEMES ---------------- */
+  /* ---------------- THEMES: tokens & fonts ---------------- */
   /* DEFAULT */
-  body.theme-default{ --bg:#0b0b0b; --panel:#111111; --text:#e9e9ea; --accent:#b64b4b; --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea; --title-font:'Cinzel Decorative', serif; --body-font:'Inter',sans-serif; --cell-size:92px; }
-  /* NÓRDICO (God of War feel) */
-  body.theme-nordic{ --bg:#121212; --panel:#1f1b17; --text:#efe6d8; --accent:#c29b58; --cell:#3e3227; --cell-text:#efe6d8; --cell-border:#7a5e38; --marked:#2b1e13; --marked-text:#e8c27c; --title-font:'Cinzel Decorative',serif; --body-font:'Noto Serif', serif; --cell-size:92px; }
-  /* BLOODBORNE (gothic classic) */
-  body.theme-blood{ --bg:#07080a; --panel:#141214; --text:#efeef2; --accent:#b10b0b; --cell:#4a2222; --cell-text:#fff0f0; --cell-border:#2d0b0b; --marked:#240606; --marked-text:#ffcfcf; --title-font:'Playfair Display',serif; --body-font:'Playfair Display',serif; --cell-size:92px; }
-  /* CYBERPUNK (neon) */
+  body.theme-default{ --bg:#0b0b0b; --panel:#111111; --text:#e9e9ea; --accent:#b64b4b; --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea; --title-font:'Cinzel Decorative',serif; --body-font:'Inter',sans-serif; --cell-size:92px; }
+  /* NORDIC (God of War style) */
+  body.theme-nordic{ --bg:#121212; --panel:#1f1b17; --text:#efe6d8; --accent:#c29b58; --cell:#3e3227; --cell-text:#efe6d8; --cell-border:#7a5e38; --marked:#2b1e13; --marked-text:#e8c27c; --title-font:'Cinzel Decorative',serif; --body-font:'Noto Serif',serif; --cell-size:92px; }
+  /* HORROR (renomeado do 'bloodborne') */
+  body.theme-horror{ --bg:#07080a; --panel:#141214; --text:#efeef2; --accent:#8b1f1f; --cell:#4a2222; --cell-text:#fff0f0; --cell-border:#2d0b0b; --marked:#240606; --marked-text:#ffcfcf; --title-font:'Playfair Display',serif; --body-font:'Playfair Display',serif; --cell-size:92px; }
+  /* CYBERPUNK */
   body.theme-cyber{ --bg:#030014; --panel:#0a0033; --text:#f0d8ff; --accent:#ff2d95; --cell:#24004a; --cell-text:#ffe6ff; --cell-border:#7a00cc; --marked:#1a0030; --marked-text:#ffb7f2; --title-font:'Orbitron',sans-serif; --body-font:'Orbitron',sans-serif; --cell-size:92px; }
   /* PIXEL 8-BIT */
   body.theme-pixel{ --bg:#0f0f0f; --panel:#1c1c1c; --text:#ffd166; --accent:#ffd166; --cell:#151515; --cell-text:#ffd166; --cell-border:#2b2b2b; --marked:#000; --marked-text:#ffd166; --title-font:'Press Start 2P',monospace; --body-font:'Press Start 2P',monospace; --cell-size:72px; --radius:4px; }
 
-  /* apply size & fonts from tokens */
-  body{background:var(--bg);font-family:var(--body-font);color:var(--text)}
+  /* apply tokens */
+  body{background:var(--bg);color:var(--text);font-family:var(--body-font)}
   h1{font-family:var(--title-font)}
   .cell{min-height:var(--cell-size);min-width:var(--cell-size);border-radius:var(--radius)}
+  .subtitle{color:rgba(255,255,255,0.72)}
+  .theme-btn{background:transparent}
+  .save-btn{position:fixed;right:18px;bottom:18px;background:#1e1e1e;color:#fff;border:1px solid rgba(255,255,255,0.06);padding:10px 12px;border-radius:10px;cursor:pointer;z-index:9999}
+  .save-btn:active{transform:translateY(1px)}
 </style>
 </head>
 <body class="theme-default">
@@ -113,7 +115,7 @@
         <div class="theme-row" style="margin-top:8px">
           <button class="theme-btn" data-theme="theme-default">Padrão</button>
           <button class="theme-btn" data-theme="theme-nordic">Nórdico</button>
-          <button class="theme-btn" data-theme="theme-blood">Bloodborne</button>
+          <button class="theme-btn" data-theme="theme-horror">Horror</button>
           <button class="theme-btn" data-theme="theme-cyber">Cyberpunk</button>
           <button class="theme-btn" data-theme="theme-pixel">Pixel 8-bit</button>
         </div>
@@ -139,22 +141,36 @@
   </div>
 </div>
 
+<!-- Save button (bottom-right) -->
+<button id="saveLocalBtn" class="save-btn" title="Salvar localmente (cache)">💾 Salvar</button>
+
 <div id="badge" class="badge">BINGO!</div>
 <div id="toast" class="toast"></div>
 <canvas id="confetti"></canvas>
 
-<!-- optional: html2canvas for PNG export (CDN) -->
+<!-- victory overlay -->
+<div class="overlay" id="overlay">
+  <div class="victory" role="dialog" aria-modal="true" aria-labelledby="victoryTitle">
+    <h2 id="victoryTitle">VOCÊ CONSEGUIU TUDO!</h2>
+    <p id="victoryMsg">Todas as linhas, colunas e diagonais foram concluídas — merece uma comemoração ÉPICA.</p>
+    <div style="margin-top:14px">
+      <button id="closeVictory">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- html2canvas CDN (for PNG export) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-/* ---------------- STATE (no localStorage) ---------------- */
+/* ---------------- STATE ---------------- */
 const state = {
   size: 5,
   editing: false,
-  cells: [], // strings
-  marks: [], // booleans
+  cells: [],
+  marks: [],
   theme: 'theme-default',
-  phrases: [], // pool
+  phrases: [],
   completedRows: [],
   completedCols: [],
   completedDiags: [false,false],
@@ -182,9 +198,11 @@ const badge = document.getElementById('badge')
 const toast = document.getElementById('toast')
 const confettiCanvas = document.getElementById('confetti')
 const confettiCtx = confettiCanvas.getContext('2d')
-const overlay = document.querySelector('.overlay') || document.createElement('div') // overlay created inline earlier
+const overlay = document.getElementById('overlay')
+const closeVictory = document.getElementById('closeVictory')
+const saveLocalBtn = document.getElementById('saveLocalBtn')
 
-/* ---------- PRESET PHRASES (Game Awards flavored) ---------- */
+/* ---------- PRESET PHRASES ---------- */
 const presetPhrases = [
   "Trailer com gameplay",
   "Anúncio surpresa",
@@ -208,7 +226,7 @@ const presetPhrases = [
   "Montagem cinematográfica impressionante"
 ]
 
-/* ---------- SOUNDS (WebAudio simple tones per theme) ---------- */
+/* ---------- AUDIO (WebAudio) ---------- */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 function playTone(freq, dur=0.06, type='sine', vol=0.06){
   if(!state.soundsOn) return
@@ -219,12 +237,10 @@ function playTone(freq, dur=0.06, type='sine', vol=0.06){
   g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur)
   setTimeout(()=>{ try{ o.stop() } catch(e){} }, dur*1000+20)
 }
-
-/* theme sound wrappers */
 function themeClickSound(){
   if(!state.soundsOn) return
   if(state.theme === 'theme-nordic'){ playTone(420,0.08,'triangle',0.06) } 
-  else if(state.theme === 'theme-blood'){ playTone(320,0.09,'sine',0.06) }
+  else if(state.theme === 'theme-horror'){ playTone(320,0.09,'sine',0.06) }
   else if(state.theme === 'theme-cyber'){ playTone(1100,0.03,'square',0.08); setTimeout(()=>playTone(900,0.03,'square',0.06),60) }
   else if(state.theme === 'theme-pixel'){ playTone(1200,0.03,'square',0.09) }
   else { playTone(540,0.06,'sine',0.06) }
@@ -363,7 +379,7 @@ function checkCompletes(){
   }
 }
 
-/* ---------- Stats update ---------- */
+/* ---------- Stats ---------- */
 function updateStatsUI(){
   const lines = state.completedRows.filter(Boolean).length
   const cols = state.completedCols.filter(Boolean).length
@@ -382,14 +398,23 @@ function isEverythingCompleted(){
 function triggerVictory(){
   if(isEverythingCompleted()){
     playBingoSound()
-    document.querySelector('.overlay').classList.add('show')
+    overlay.classList.add('show')
     confettiBurst(220)
-    document.querySelector('.victory h2').innerText = 'VOCÊ CONSEGUIU TUDO!'
-    document.querySelector('.victory p').innerText = 'Todas as linhas, colunas e diagonais foram concluídas — merece uma celebração ÉPICA.'
+    document.getElementById('victoryTitle').innerText = 'VOCÊ CONSEGUIU TUDO!'
+    document.getElementById('victoryMsg').innerText = 'Todas as linhas, colunas e diagonais foram concluídas — merece uma celebração ÉPICA.'
     showToast('Vitória completa!', 2200)
   }
 }
-function closeVictoryImmediate(){ document.querySelector('.overlay').classList.remove('show') }
+function closeVictoryImmediate(){ overlay.classList.remove('show') }
+
+/* Close overlay with click outside, ESC, or button */
+overlay.addEventListener('click', (e) => {
+  if(e.target === overlay) closeVictoryImmediate()
+})
+closeVictory.addEventListener('click', closeVictoryImmediate)
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeVictoryImmediate()
+})
 
 /* ---------- Confetti ---------- */
 function resizeC(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight }
@@ -417,7 +442,7 @@ function confettiLoop(){
   if(confettiPieces.length>0) requestAnimationFrame(confettiLoop); else confettiAnimating=false
 }
 
-/* ---------- PNG download (html2canvas required) ---------- */
+/* ---------- PNG download ---------- */
 async function downloadPNG(){
   showToast('Gerando imagem...')
   try{
@@ -427,15 +452,16 @@ async function downloadPNG(){
   }catch(e){ showToast('Erro ao gerar imagem') }
 }
 
-/* ---------- Theme application ---------- */
+/* ---------- Theme apply ---------- */
 function applyTheme(cls){
+  // cls are like 'theme-default','theme-nordic','theme-horror', etc.
   document.body.className = cls
   state.theme = cls
-  // small indicator sound
+  // subtle feedback
   themeClickSound()
 }
 
-/* ---------- Wire UI events ---------- */
+/* ---------- UI events ---------- */
 sizeSel.addEventListener('change', ()=> {
   const s = parseInt(sizeSel.value); state.size = s; ensureArrays(s); buildGrid(s)
 })
@@ -458,34 +484,68 @@ clearBtn.addEventListener('click', ()=> {
 })
 themeBtns.forEach(b => b.addEventListener('click', ()=> applyTheme(b.dataset.theme)))
 
-/* overlay close/share handling */
-document.getElementById('closeVictory')?.addEventListener('click', ()=> closeVictoryImmediate())
-document.getElementById('shareVictory')?.addEventListener('click', ()=> { navigator.clipboard && navigator.clipboard.writeText(location.href); showToast('Link copiado (sem estado)') })
+/* ---------- LOCAL SAVE / LOAD (cache) ---------- */
+const LOCAL_KEY = 'neurobingo_cache_v1'
 
-/* ---------- Initialization ---------- */
+function saveLocal(){
+  try{
+    const payload = {
+      size: state.size,
+      cells: state.cells,
+      marks: state.marks,
+      theme: state.theme,
+      completedRows: state.completedRows,
+      completedCols: state.completedCols,
+      completedDiags: state.completedDiags
+    }
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(payload))
+    showToast('Salvo no cache do navegador')
+  }catch(e){ showToast('Falha ao salvar') }
+}
+
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_KEY)
+    if(!raw) return false
+    const obj = JSON.parse(raw)
+    if(obj && obj.size && Array.isArray(obj.cells)){
+      state.size = obj.size
+      state.cells = obj.cells
+      state.marks = obj.marks || Array(state.size*state.size).fill(false)
+      state.theme = obj.theme || state.theme
+      state.completedRows = obj.completedRows || Array(state.size).fill(false)
+      state.completedCols = obj.completedCols || Array(state.size).fill(false)
+      state.completedDiags = obj.completedDiags || [false,false]
+      // update UI
+      sizeSel.value = state.size
+      applyTheme(state.theme)
+      buildGrid(state.size)
+      render()
+      showToast('Dados restaurados do cache')
+      return true
+    }
+  }catch(e){ console.warn('loadLocal failed', e) }
+  return false
+}
+saveLocalBtn.addEventListener('click', saveLocal)
+
+/* ---------- Preset load & initialization ---------- */
 function start(){
-  // default pool if user didn't input anything
   state.phrases = presetPhrases.slice()
-  state.size = parseInt(sizeSel.value)
-  ensureArrays(state.size)
-  buildGrid(state.size)
-  render()
+  // try load cache; if not loaded, build default
+  const loaded = loadLocal()
+  if(!loaded){
+    state.size = parseInt(sizeSel.value)
+    ensureArrays(state.size)
+    buildGrid(state.size)
+    render()
+  }
 }
 start()
 
-/* ---------- End ---------- */
+/* ---------- Share helpers (optional small) ---------- */
+document.getElementById('closeVictory')?.addEventListener('click', ()=> closeVictoryImmediate())
+
 </script>
-
-<!-- victory overlay DOM (kept at bottom to match script listeners) -->
-<div class="overlay">
-  <div class="victory">
-    <h2>Parabéns!</h2>
-    <p>Você completou tudo — merece uma comemoração épica!</p>
-    <div style="margin-top:14px">
-      <button id="closeVictory">Fechar</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
