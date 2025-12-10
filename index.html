@@ -1,287 +1,491 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Bingo Game Awards</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NeuroBingo — Final Único</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:wght@400;700&family=Orbitron:wght@400;700&family=Press+Start+2P&family=Noto+Serif:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-    }
+  :root{
+    --radius:10px; --gap:8px; --cell-size:92px;
+    /* default theme tokens (will be overridden by body.theme-*) */
+    --bg:#0b0b0b; --panel:#111111; --text:#e9e9ea; --accent:#b64b4b;
+    --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea;
+    --title-font:'Cinzel Decorative', serif; --body-font:'Inter',sans-serif;
+  }
 
-    h1 {
-        margin-bottom: 10px;
-        text-align: center;
-    }
+  /* Layout */
+  html,body{height:100%;margin:0;font-family:var(--body-font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:20px auto;padding:18px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  h1{font-family:var(--title-font);margin:0;color:var(--accent);font-size:28px}
+  .subtitle{font-size:13px;color:rgba(255,255,255,0.7);margin-top:4px}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  select,textarea,input[type="text"]{background:var(--panel);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--text)}
+  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer;font-weight:600}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
+  .main{display:flex;gap:18px;margin-top:14px;align-items:flex-start}
+  .board{flex:1;display:flex;flex-direction:column;gap:12px}
+  .grid{display:grid;gap:var(--gap);padding:12px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,0.6);background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+  .cell{background:var(--cell);color:var(--cell-text);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;border-radius:8px;cursor:pointer;user-select:none;min-height:var(--cell-size);min-width:var(--cell-size);border:1px solid var(--cell-border);transition:transform .12s, box-shadow .12s}
+  .cell:hover{transform:translateY(-6px)}
+  .cell.marked{background:var(--marked);color:var(--marked-text);text-decoration:line-through;border-color:transparent;box-shadow:0 8px 18px rgba(0,0,0,0.45)}
+  .sidebar{width:320px;min-width:260px;display:flex;flex-direction:column;gap:12px}
+  .theme-row{display:flex;gap:8px;flex-wrap:wrap}
+  .theme-btn{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+  .stats{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .stat{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;font-weight:600}
+  .badge{position:fixed;left:18px;bottom:18px;padding:10px 14px;border-radius:12px;background:var(--accent);color:#fff;display:none;z-index:9999}
+  .toast{position:fixed;right:18px;bottom:18px;padding:10px 14px;border-radius:10px;background:rgba(0,0,0,0.6);color:#fff;display:none;z-index:9999}
+  canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;z-index:9998}
+  /* Victory modal */
+  .overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;visibility:hidden;opacity:0;transition:all .25s}
+  .overlay.show{visibility:visible;opacity:1}
+  .victory{background:linear-gradient(180deg,#111 0%, #1b0b0b 100%);padding:28px;border-radius:14px;color:#fff;max-width:720px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.7)}
+  .victory h2{margin:0 0 8px;font-size:32px}
+  @media(max-width:980px){ .main{flex-direction:column} .sidebar{width:100%} .grid{padding:8px} }
 
-    #controls {
-        margin-bottom: 20px;
-    }
+  /* ---------------- THEMES ---------------- */
+  /* DEFAULT */
+  body.theme-default{ --bg:#0b0b0b; --panel:#111111; --text:#e9e9ea; --accent:#b64b4b; --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea; --title-font:'Cinzel Decorative', serif; --body-font:'Inter',sans-serif; --cell-size:92px; }
+  /* NÓRDICO (God of War feel) */
+  body.theme-nordic{ --bg:#121212; --panel:#1f1b17; --text:#efe6d8; --accent:#c29b58; --cell:#3e3227; --cell-text:#efe6d8; --cell-border:#7a5e38; --marked:#2b1e13; --marked-text:#e8c27c; --title-font:'Cinzel Decorative',serif; --body-font:'Noto Serif', serif; --cell-size:92px; }
+  /* BLOODBORNE (gothic classic) */
+  body.theme-blood{ --bg:#07080a; --panel:#141214; --text:#efeef2; --accent:#b10b0b; --cell:#4a2222; --cell-text:#fff0f0; --cell-border:#2d0b0b; --marked:#240606; --marked-text:#ffcfcf; --title-font:'Playfair Display',serif; --body-font:'Playfair Display',serif; --cell-size:92px; }
+  /* CYBERPUNK (neon) */
+  body.theme-cyber{ --bg:#030014; --panel:#0a0033; --text:#f0d8ff; --accent:#ff2d95; --cell:#24004a; --cell-text:#ffe6ff; --cell-border:#7a00cc; --marked:#1a0030; --marked-text:#ffb7f2; --title-font:'Orbitron',sans-serif; --body-font:'Orbitron',sans-serif; --cell-size:92px; }
+  /* PIXEL 8-BIT */
+  body.theme-pixel{ --bg:#0f0f0f; --panel:#1c1c1c; --text:#ffd166; --accent:#ffd166; --cell:#151515; --cell-text:#ffd166; --cell-border:#2b2b2b; --marked:#000; --marked-text:#ffd166; --title-font:'Press Start 2P',monospace; --body-font:'Press Start 2P',monospace; --cell-size:72px; --radius:4px; }
 
-    select, button {
-        padding: 8px 12px;
-        margin: 5px;
-        border: none;
-        cursor: pointer;
-        border-radius: 6px;
-        font-size: 16px;
-    }
-
-    #grid {
-        display: grid;
-        gap: 5px;
-        margin-top: 20px;
-    }
-
-    .cell {
-        padding: 15px;
-        background: #222;
-        border-radius: 6px;
-        text-align: center;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .cell.marked {
-        background: #3fa93f;
-        color: black;
-        font-weight: bold;
-    }
-
-    #scoreBox {
-        margin-top: 20px;
-        font-size: 20px;
-        text-align: center;
-    }
-
-    /* ---------------- TEMAS ---------------- */
-
-    /* PADRÃO / GAME AWARDS */
-    .theme-default {
-        --bg: #111;
-        --cell: #222;
-        --font: Arial, sans-serif;
-    }
-
-    /* NÓRDICO - GOD OF WAR */
-    @font-face {
-        font-family: "Nordic";
-        src: url("https://fonts.cdnfonts.com/s/17890/nordica.woff") format("woff");
-    }
-    .theme-nordic {
-        --bg: #2b2b2b;
-        --cell: #3a3a3a;
-        --font: "Nordic", serif;
-    }
-
-    /* BLOODBORNE */
-    @font-face {
-        font-family: "Bloodborne";
-        src: url("https://fonts.cdnfonts.com/s/24011/gothic_ultra_ot.otf") format("opentype");
-    }
-    .theme-bloodborne {
-        --bg: #0e0d0d;
-        --cell: #2a1f1f;
-        --font: "Bloodborne", serif;
-    }
-
-    /* NEON FUTURISTA */
-    @font-face {
-        font-family: "Neon";
-        src: url("https://fonts.cdnfonts.com/s/20738/neon_led_light.woff") format("woff");
-    }
-    .theme-neon {
-        --bg: #030014;
-        --cell: #111144;
-        --font: "Neon", sans-serif;
-        color: #7fffd4;
-        text-shadow: 0 0 6px #0ff;
-    }
-
-    /* PIXEL / 8-BIT */
-    @font-face {
-        font-family: "Pixel";
-        src: url("https://fonts.cdnfonts.com/s/14566/PressStart2P-Regular.woff") format("woff");
-    }
-    .theme-pixel {
-        --bg: #1b1b1b;
-        --cell: #333;
-        --font: "Pixel", monospace;
-    }
-
-    /* Aplicação automática do tema */
-    body {
-        background: var(--bg);
-        font-family: var(--font);
-    }
-    .cell { background: var(--cell); }
-
+  /* apply size & fonts from tokens */
+  body{background:var(--bg);font-family:var(--body-font);color:var(--text)}
+  h1{font-family:var(--title-font)}
+  .cell{min-height:var(--cell-size);min-width:var(--cell-size);border-radius:var(--radius)}
 </style>
 </head>
 <body class="theme-default">
 
-<h1>O melhor bingo do ano</h1>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>NeuroBingo</h1>
+      <div class="subtitle">O melhor bingo do ano</div>
+    </div>
 
-<div id="controls">
-    <select id="theme">
-        <option value="default">Padrão</option>
-        <option value="nordic">Nórdico (God of War)</option>
-        <option value="bloodborne">Bloodborne</option>
-        <option value="neon">Neon Futurista</option>
-        <option value="pixel">8-Bit</option>
-    </select>
+    <div class="controls">
+      <label style="font-size:13px;color:rgba(255,255,255,0.8)">Grid</label>
+      <select id="gridSize" title="Tamanho do grid">
+        <option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
+        <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+        <option value="9">9</option><option value="10">10</option>
+      </select>
 
-    <select id="size">
-        <option value="3">3x3</option>
-        <option value="4">4x4</option>
-        <option value="5">5x5</option>
-        <option value="6">6x6</option>
-        <option value="7">7x7</option>
-        <option value="8">8x8</option>
-        <option value="9">9x9</option>
-        <option value="10">10x10</option>
-    </select>
+      <button id="editToggle">✎ Editar</button>
+      <button id="shuffleBtn" class="ghost">Embaralhar</button>
+      <button id="generateBtn" class="ghost">Gerar aleatório</button>
+      <button id="downloadBtn" class="ghost">Baixar PNG</button>
+      <button id="muteBtn" class="ghost">🔊</button>
+    </div>
+  </header>
 
-    <button onclick="generateGrid()">Gerar Bingo</button>
+  <div class="main">
+    <div class="board">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="stats">
+          <div class="stat">Linhas: <span id="linesCount">0</span></div>
+          <div class="stat">Colunas: <span id="colsCount">0</span></div>
+          <div class="stat">Diagonais: <span id="diagsCount">0</span></div>
+        </div>
+      </div>
+
+      <div id="grid" class="grid" aria-label="bingo-grid"></div>
+    </div>
+
+    <aside class="sidebar">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;color:rgba(255,255,255,0.8)">Temas</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.6)">Fonte & som</div>
+        </div>
+        <div class="theme-row" style="margin-top:8px">
+          <button class="theme-btn" data-theme="theme-default">Padrão</button>
+          <button class="theme-btn" data-theme="theme-nordic">Nórdico</button>
+          <button class="theme-btn" data-theme="theme-blood">Bloodborne</button>
+          <button class="theme-btn" data-theme="theme-cyber">Cyberpunk</button>
+          <button class="theme-btn" data-theme="theme-pixel">Pixel 8-bit</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8)">Frases (uma por linha)</div>
+        <textarea id="phrasesPool" style="width:100%;height:120px;margin-top:8px" placeholder="Cole frases (uma por linha) ou use o conjunto pré-definido abaixo"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="applyPhrases">Aplicar</button>
+          <button id="fillBtn" class="ghost">Preencher</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8)">Extras</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="confettiBtn" class="ghost">Confete</button>
+          <button id="clearBtn" class="ghost">Limpar</button>
+        </div>
+      </div>
+    </aside>
+  </div>
 </div>
 
-<div id="grid"></div>
+<div id="badge" class="badge">BINGO!</div>
+<div id="toast" class="toast"></div>
+<canvas id="confetti"></canvas>
 
-<div id="scoreBox">
-    Linhas completas: <span id="lineCount">0</span><br>
-    Colunas completas: <span id="colCount">0</span><br>
-    Diagonais completas: <span id="diagCount">0</span><br>
-</div>
+<!-- optional: html2canvas for PNG export (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-/* ----------------- FRASES ALEATÓRIAS ----------------- */
-
-const phrases = [
-    "Jogo que ninguém pediu ganha prêmio",
-    "Trailer que emociona mais do que devia",
-    "Indie esmaga AAA novamente",
-    "Silêncio constrangedor no palco",
-    "Platéia vibra sem saber por quê",
-    "O apresentador fala rápido demais",
-    "Música épica sem motivo",
-    "Indicação inesperada do nada",
-    "Categoria aleatória aparecendo",
-    "Cinemática que nunca será assim no jogo",
-    "Multiplayer leva prêmio que não faz sentido",
-    "Jogo do ano vira discussão eterna",
-    "Discurso interrompido",
-    "Anúncio que ninguém entendeu",
-    "Menção a DLC surpresa",
-    "Performance musical aleatória"
-];
-
-/* ----------------- SONS POR TEMA ----------------- */
-
-const sounds = {
-    default: "https://actions.google.com/sounds/v1/cartoon/pop.ogg",
-    nordic: "https://actions.google.com/sounds/v1/foley/wood_plank_flicks.ogg",
-    bloodborne: "https://actions.google.com/sounds/v1/horror/monster_growl.ogg",
-    neon: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg",
-    pixel: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-};
-
-let clickSound = new Audio(sounds.default);
-
-/* ----------------- GERAÇÃO DO GRID ----------------- */
-
-function generateGrid() {
-    const size = parseInt(document.getElementById("size").value);
-    const theme = document.getElementById("theme").value;
-
-    // mudar tema
-    document.body.className = "theme-" + theme;
-    clickSound = new Audio(sounds[theme]);
-
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
-    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-
-    let pool = [...phrases];
-
-    for (let i = 0; i < size * size; i++) {
-        const div = document.createElement("div");
-        div.classList.add("cell");
-
-        const text = pool[Math.floor(Math.random() * pool.length)];
-        div.textContent = text;
-
-        div.addEventListener("click", () => {
-            div.classList.toggle("marked");
-            clickSound.currentTime = 0;
-            clickSound.play();
-            updateScore();
-        });
-
-        grid.appendChild(div);
-    }
-
-    updateScore();
+/* ---------------- STATE (no localStorage) ---------------- */
+const state = {
+  size: 5,
+  editing: false,
+  cells: [], // strings
+  marks: [], // booleans
+  theme: 'theme-default',
+  phrases: [], // pool
+  completedRows: [],
+  completedCols: [],
+  completedDiags: [false,false],
+  soundsOn: true
 }
 
-/* ----------------- CONTAGEM ----------------- */
+/* ---------- DOM refs ---------- */
+const gridEl = document.getElementById('grid')
+const sizeSel = document.getElementById('gridSize')
+const editToggle = document.getElementById('editToggle')
+const shuffleBtn = document.getElementById('shuffleBtn')
+const generateBtn = document.getElementById('generateBtn')
+const downloadBtn = document.getElementById('downloadBtn')
+const muteBtn = document.getElementById('muteBtn')
+const linesCountEl = document.getElementById('linesCount')
+const colsCountEl = document.getElementById('colsCount')
+const diagsCountEl = document.getElementById('diagsCount')
+const themeBtns = document.querySelectorAll('.theme-btn')
+const phrasesTa = document.getElementById('phrasesPool')
+const applyPhrasesBtn = document.getElementById('applyPhrases')
+const fillBtn = document.getElementById('fillBtn')
+const confettiBtn = document.getElementById('confettiBtn')
+const clearBtn = document.getElementById('clearBtn')
+const badge = document.getElementById('badge')
+const toast = document.getElementById('toast')
+const confettiCanvas = document.getElementById('confetti')
+const confettiCtx = confettiCanvas.getContext('2d')
+const overlay = document.querySelector('.overlay') || document.createElement('div') // overlay created inline earlier
 
-function updateScore() {
-    const size = parseInt(document.getElementById("size").value);
-    const cells = [...document.querySelectorAll(".cell")];
+/* ---------- PRESET PHRASES (Game Awards flavored) ---------- */
+const presetPhrases = [
+  "Trailer com gameplay",
+  "Anúncio surpresa",
+  "Indie ganha prêmio principal",
+  "Multiplayer anunciado",
+  "Port para Switch anunciado",
+  "Remake/Remaster anunciado",
+  "Menção a clássico",
+  "Erro técnico ao vivo",
+  "Apresentador faz piada",
+  "Live reaction famosa",
+  "DLC anunciada",
+  "Novo IP anunciado",
+  "Performance musical no palco",
+  "Cosplayer é destaque",
+  "Parceria inesperada",
+  "Trailer com ritmo acelerado",
+  "Desempenho ao vivo",
+  "Falas emocionantes no discurso",
+  "Cena que vira meme",
+  "Montagem cinematográfica impressionante"
+]
 
-    const marked = i => cells[i].classList.contains("marked");
-
-    let lineTotal = 0, colTotal = 0, diagTotal = 0;
-
-    // linhas
-    for (let r = 0; r < size; r++) {
-        let ok = true;
-        for (let c = 0; c < size; c++) {
-            if (!marked(r * size + c)) ok = false;
-        }
-        if (ok) lineTotal++;
-    }
-
-    // colunas
-    for (let c = 0; c < size; c++) {
-        let ok = true;
-        for (let r = 0; r < size; r++) {
-            if (!marked(r * size + c)) ok = false;
-        }
-        if (ok) colTotal++;
-    }
-
-    // diagonal principal
-    let ok1 = true;
-    for (let i = 0; i < size; i++) {
-        if (!marked(i * size + i)) ok1 = false;
-    }
-    if (ok1) diagTotal++;
-
-    // diagonal secundária
-    let ok2 = true;
-    for (let i = 0; i < size; i++) {
-        if (!marked(i * size + (size - 1 - i))) ok2 = false;
-    }
-    if (ok2) diagTotal++;
-
-    document.getElementById("lineCount").textContent = lineTotal;
-    document.getElementById("colCount").textContent = colTotal;
-    document.getElementById("diagCount").textContent = diagTotal;
-
-    // tudo completo
-    if (lineTotal === size && colTotal === size && diagTotal === 2) {
-        alert("✨ VOCÊ COMPLETOU O BINGO INTEIRO! Um verdadeiro campeão do Game Awards! ✨");
-    }
+/* ---------- SOUNDS (WebAudio simple tones per theme) ---------- */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+function playTone(freq, dur=0.06, type='sine', vol=0.06){
+  if(!state.soundsOn) return
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain()
+  o.type = type; o.frequency.value = freq; g.gain.value = vol
+  o.connect(g); g.connect(audioCtx.destination)
+  o.start()
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur)
+  setTimeout(()=>{ try{ o.stop() } catch(e){} }, dur*1000+20)
 }
 
+/* theme sound wrappers */
+function themeClickSound(){
+  if(!state.soundsOn) return
+  if(state.theme === 'theme-nordic'){ playTone(420,0.08,'triangle',0.06) } 
+  else if(state.theme === 'theme-blood'){ playTone(320,0.09,'sine',0.06) }
+  else if(state.theme === 'theme-cyber'){ playTone(1100,0.03,'square',0.08); setTimeout(()=>playTone(900,0.03,'square',0.06),60) }
+  else if(state.theme === 'theme-pixel'){ playTone(1200,0.03,'square',0.09) }
+  else { playTone(540,0.06,'sine',0.06) }
+}
+function playLineSound(){ if(!state.soundsOn) return; playTone(720,0.08,'sine',0.06) }
+function playBingoSound(){ if(!state.soundsOn) return; playTone(520,0.26,'square',0.09); setTimeout(()=>playTone(860,0.12,'sine',0.08),240) }
+function playShuffleSound(){ if(!state.soundsOn) return; playTone(400,0.06,'sawtooth',0.06); setTimeout(()=>playTone(520,0.05,'sine',0.05),80) }
+
+/* ---------- UTILS (toast/badge) ---------- */
+function showToast(msg, ms=1500){ toast.innerText = msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none', ms) }
+function showBadge(msg, ms=1500){ badge.innerText = msg; badge.style.display='block'; setTimeout(()=>badge.style.display='none', ms) }
+
+/* ---------- GRID BUILD / RENDER ---------- */
+function ensureArrays(size){
+  const total = size*size
+  if(!state.cells || state.cells.length !== total) state.cells = Array(total).fill('')
+  if(!state.marks || state.marks.length !== total) state.marks = Array(total).fill(false)
+  state.completedRows = Array(size).fill(false)
+  state.completedCols = Array(size).fill(false)
+  state.completedDiags = [false,false]
+}
+
+function buildGrid(size = state.size){
+  state.size = size
+  ensureArrays(size)
+  gridEl.innerHTML = ''
+  gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`
+  const total = size*size
+  for(let i=0;i<total;i++){
+    const cell = document.createElement('div')
+    cell.className = 'cell'
+    cell.dataset.index = i
+    const inner = document.createElement('div'); inner.className='inner'; inner.style.width='100%'; inner.style.wordBreak='break-word'; inner.style.fontWeight='600'
+    inner.innerText = state.cells[i] || ''
+    cell.appendChild(inner)
+    cell.addEventListener('click', ()=> onCellClick(i, cell))
+    cell.addEventListener('dblclick', ()=> editCell(i))
+    gridEl.appendChild(cell)
+  }
+  render()
+}
+
+function render(){
+  const nodes = gridEl.querySelectorAll('.cell')
+  for(let i=0;i<nodes.length;i++){
+    const n = nodes[i]
+    n.querySelector('.inner').innerText = state.cells[i] || ''
+    n.classList.toggle('marked', !!state.marks[i])
+  }
+  updateStatsUI()
+}
+
+/* ---------- Edit / Click handlers ---------- */
+function toggleEdit(){
+  state.editing = !state.editing
+  editToggle.innerText = state.editing ? '✓ Salvando' : '✎ Editar'
+  editToggle.style.opacity = state.editing ? '1' : '0.9'
+}
+editToggle.addEventListener('click', ()=> toggleEdit())
+
+function editCell(index){
+  const prev = state.cells[index] || ''
+  const val = prompt('Edite o texto da célula:', prev)
+  if(val === null) return
+  state.cells[index] = val
+  state.marks[index] = false
+  render()
+}
+
+function onCellClick(i, el){
+  if(state.editing){ editCell(i); return }
+  state.marks[i] = !state.marks[i]
+  render()
+  themeClickSound()
+  checkCompletes()
+}
+
+/* ---------- Shuffle / Random fill ---------- */
+function shuffleCells(){
+  const arr = state.cells.slice()
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]] }
+  state.cells = arr
+  state.marks = Array(state.size*state.size).fill(false)
+  render()
+  playShuffleSound()
+  showToast('Embaralhado')
+}
+
+function randomFill(){
+  const pool = state.phrases.length ? state.phrases.slice() : presetPhrases.slice()
+  const total = state.size*state.size
+  while(pool.length < total) pool.push(...(state.phrases.length?state.phrases:presetPhrases))
+  for(let i=0;i<total;i++){
+    const j = Math.floor(Math.random()*pool.length)
+    state.cells[i] = pool.splice(j,1)[0]
+    state.marks[i] = false
+  }
+  render()
+  showToast('Preenchido aleatoriamente')
+}
+
+/* ---------- Check completes ---------- */
+function checkCompletes(){
+  const n = state.size, m = state.marks
+  let newRow=false,newCol=false,newDiag=false
+  // rows
+  for(let r=0;r<n;r++){
+    let ok=true
+    for(let c=0;c<n;c++) if(!m[r*n+c]){ ok=false; break }
+    if(ok && !state.completedRows[r]){ state.completedRows[r]=true; newRow=true; showBadge(`Linha ${r+1} concluída`); playLineSound() }
+    if(!ok && state.completedRows[r]) state.completedRows[r]=false
+  }
+  // cols
+  for(let c=0;c<n;c++){
+    let ok=true
+    for(let r=0;r<n;r++) if(!m[r*n+c]){ ok=false; break }
+    if(ok && !state.completedCols[c]){ state.completedCols[c]=true; newCol=true; showBadge(`Coluna ${c+1} concluída`); playLineSound() }
+    if(!ok && state.completedCols[c]) state.completedCols[c]=false
+  }
+  // diag1
+  let ok=true
+  for(let i=0;i<n;i++) if(!m[i*n+i]){ ok=false; break }
+  if(ok && !state.completedDiags[0]){ state.completedDiags[0]=true; newDiag=true; showBadge('Diagonal principal concluída'); playLineSound() }
+  if(!ok && state.completedDiags[0]) state.completedDiags[0]=false
+  // diag2
+  ok=true
+  for(let i=0;i<n;i++) if(!m[i*n+(n-1-i)]){ ok=false; break }
+  if(ok && !state.completedDiags[1]){ state.completedDiags[1]=true; newDiag=true; showBadge('Diagonal secundária concluída'); playLineSound() }
+  if(!ok && state.completedDiags[1]) state.completedDiags[1]=false
+
+  updateStatsUI()
+  if(newRow || newCol || newDiag){
+    setTimeout(()=>{ if(isEverythingCompleted()) triggerVictory() }, 300)
+  } else {
+    if(!isEverythingCompleted()) closeVictoryImmediate()
+  }
+}
+
+/* ---------- Stats update ---------- */
+function updateStatsUI(){
+  const lines = state.completedRows.filter(Boolean).length
+  const cols = state.completedCols.filter(Boolean).length
+  const diags = state.completedDiags.filter(Boolean).length
+  linesCountEl.innerText = lines
+  colsCountEl.innerText = cols
+  diagsCountEl.innerText = diags
+}
+function isEverythingCompleted(){
+  const totalPossible = state.size + state.size + 2
+  const have = state.completedRows.filter(Boolean).length + state.completedCols.filter(Boolean).length + state.completedDiags.filter(Boolean).length
+  return have === totalPossible
+}
+
+/* ---------- Victory ---------- */
+function triggerVictory(){
+  if(isEverythingCompleted()){
+    playBingoSound()
+    document.querySelector('.overlay').classList.add('show')
+    confettiBurst(220)
+    document.querySelector('.victory h2').innerText = 'VOCÊ CONSEGUIU TUDO!'
+    document.querySelector('.victory p').innerText = 'Todas as linhas, colunas e diagonais foram concluídas — merece uma celebração ÉPICA.'
+    showToast('Vitória completa!', 2200)
+  }
+}
+function closeVictoryImmediate(){ document.querySelector('.overlay').classList.remove('show') }
+
+/* ---------- Confetti ---------- */
+function resizeC(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight }
+window.addEventListener('resize', resizeC); resizeC()
+let confettiPieces = [], confettiAnimating=false
+function confettiBurst(count=100){
+  confettiPieces = []
+  for(let i=0;i<count;i++){
+    confettiPieces.push({x:Math.random()*confettiCanvas.width,y:-Math.random()*200,vx:(Math.random()-0.5)*8,vy:2+Math.random()*6,size:6+Math.random()*10,color:`hsl(${Math.random()*360} 80% 60%)`,rot:Math.random()*360,rotSpeed:(Math.random()-0.5)*10})
+  }
+  if(!confettiAnimating) requestAnimationFrame(confettiLoop)
+}
+function confettiLoop(){
+  confettiAnimating=true
+  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height)
+  for(let p of confettiPieces){
+    p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.rot += p.rotSpeed
+    confettiCtx.save()
+    confettiCtx.translate(p.x,p.y); confettiCtx.rotate(p.rot*Math.PI/180)
+    confettiCtx.fillStyle = p.color
+    confettiCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6)
+    confettiCtx.restore()
+  }
+  confettiPieces = confettiPieces.filter(p => p.y < confettiCanvas.height + 100)
+  if(confettiPieces.length>0) requestAnimationFrame(confettiLoop); else confettiAnimating=false
+}
+
+/* ---------- PNG download (html2canvas required) ---------- */
+async function downloadPNG(){
+  showToast('Gerando imagem...')
+  try{
+    const canvas = await html2canvas(gridEl, {backgroundColor: null, scale:2})
+    const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = 'neurobingo.png'; a.click()
+    showToast('Imagem pronta')
+  }catch(e){ showToast('Erro ao gerar imagem') }
+}
+
+/* ---------- Theme application ---------- */
+function applyTheme(cls){
+  document.body.className = cls
+  state.theme = cls
+  // small indicator sound
+  themeClickSound()
+}
+
+/* ---------- Wire UI events ---------- */
+sizeSel.addEventListener('change', ()=> {
+  const s = parseInt(sizeSel.value); state.size = s; ensureArrays(s); buildGrid(s)
+})
+shuffleBtn.addEventListener('click', ()=> shuffleCells())
+generateBtn.addEventListener('click', ()=> randomFill())
+downloadBtn.addEventListener('click', ()=> downloadPNG())
+muteBtn.addEventListener('click', ()=> { state.soundsOn = !state.soundsOn; muteBtn.innerText = state.soundsOn ? '🔊' : '🔇' })
+applyPhrasesBtn.addEventListener('click', ()=> {
+  const raw = phrasesTa.value.trim(); state.phrases = raw ? raw.split('\n').map(s=>s.trim()).filter(Boolean) : []
+  showToast((state.phrases.length||presetPhrases.length) + ' frases carregadas')
+})
+fillBtn.addEventListener('click', ()=> randomFill())
+confettiBtn.addEventListener('click', ()=> confettiBurst(120))
+clearBtn.addEventListener('click', ()=> {
+  if(confirm('Limpar a cartela?')){
+    state.cells = Array(state.size*state.size).fill(''); state.marks = Array(state.size*state.size).fill(false)
+    state.completedRows = Array(state.size).fill(false); state.completedCols = Array(state.size).fill(false); state.completedDiags = [false,false]
+    render()
+  }
+})
+themeBtns.forEach(b => b.addEventListener('click', ()=> applyTheme(b.dataset.theme)))
+
+/* overlay close/share handling */
+document.getElementById('closeVictory')?.addEventListener('click', ()=> closeVictoryImmediate())
+document.getElementById('shareVictory')?.addEventListener('click', ()=> { navigator.clipboard && navigator.clipboard.writeText(location.href); showToast('Link copiado (sem estado)') })
+
+/* ---------- Initialization ---------- */
+function start(){
+  // default pool if user didn't input anything
+  state.phrases = presetPhrases.slice()
+  state.size = parseInt(sizeSel.value)
+  ensureArrays(state.size)
+  buildGrid(state.size)
+  render()
+}
+start()
+
+/* ---------- End ---------- */
 </script>
+
+<!-- victory overlay DOM (kept at bottom to match script listeners) -->
+<div class="overlay">
+  <div class="victory">
+    <h2>Parabéns!</h2>
+    <p>Você completou tudo — merece uma comemoração épica!</p>
+    <div style="margin-top:14px">
+      <button id="closeVictory">Fechar</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
