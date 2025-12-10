@@ -1,601 +1,287 @@
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NeuroBingo — Final</title>
-
-<!-- Fonts chosen for themes:
-     Cinzel Decorative (nórdico/runic-ish),
-     Playfair Display (bloodborne/gothic),
-     Orbitron (cyberpunk/neon),
-     Press Start 2P (pixel 8-bit)
--->
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:wght@400;700&family=Orbitron:wght@400;700&family=Press+Start+2P&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8" />
+<title>Bingo Game Awards</title>
 <style>
-  :root{
-    --bg:#0b0b0b; --bg2:#111; --text:#e9e9ea; --accent:#b64b4b; --muted:rgba(255,255,255,0.7);
-    --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea;
-    --radius:10px; --gap:8px; --cell-size:84px;
-    --title-font: 'Cinzel Decorative', serif;
-    --body-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
 
-  /* Base */
-  html,body{height:100%;margin:0;font-family:var(--body-font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-  .container{max-width:1120px;margin:18px auto;padding:18px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{font-family:var(--title-font);margin:0;color:var(--accent);font-size:28px}
-  .subtitle{font-size:13px;color:var(--muted);margin-top:4px}
-  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  select,textarea,input[type="text"]{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--text)}
-  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer;font-weight:600}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
-  .main{display:flex;gap:18px;margin-top:14px;align-items:flex-start}
-  .board{flex:1;display:flex;flex-direction:column;gap:12px}
-  .grid{display:grid;gap:var(--gap);background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,0.6)}
-  .cell{background:var(--cell);color:var(--cell-text);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;border-radius:var(--radius);cursor:pointer;user-select:none;min-height:var(--cell-size);min-width:var(--cell-size);border:1px solid var(--cell-border);transition:transform .12s, box-shadow .12s}
-  .cell:hover{transform:translateY(-6px)}
-  .cell.marked{background:var(--marked);color:var(--marked-text);text-decoration:line-through;border-color:transparent;box-shadow:0 8px 18px rgba(0,0,0,0.6)}
-  .sidebar{width:320px;min-width:260px;display:flex;flex-direction:column;gap:12px}
-  .theme-row{display:flex;gap:8px;flex-wrap:wrap}
-  .theme-btn{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
-  .stats{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .stat{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;font-weight:600}
-  .badge{position:fixed;left:18px;bottom:18px;padding:10px 14px;border-radius:12px;background:var(--accent);color:#fff;display:none;z-index:9999}
-  .toast{position:fixed;right:18px;bottom:18px;padding:10px 14px;border-radius:10px;background:rgba(0,0,0,0.6);color:#fff;display:none;z-index:9999}
-  canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;z-index:9998}
-  /* Victory modal */
-  .overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;visibility:hidden;opacity:0;transition:all .25s}
-  .overlay.show{visibility:visible;opacity:1}
-  .victory-panel{background:linear-gradient(180deg,#111 0%, #1b0b0b 100%);padding:28px;border-radius:14px;color:#fff;max-width:720px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.7)}
-  .victory-panel h2{margin:0 0 8px;font-size:32px}
-  .victory-panel p{margin:0 0 16px}
-  /* small screens */
-  @media(max-width:980px){ .main{flex-direction:column} .sidebar{width:100%} .grid{padding:8px} }
+    h1 {
+        margin-bottom: 10px;
+        text-align: center;
+    }
 
-  /* ---------------- THEMES: colors + fonts ---------------- */
-  .theme-default{ --bg:#0b0b0b; --bg2:#111; --text:#e9e9ea; --accent:#b64b4b; --cell:#222; --cell-text:#eee; --marked:#2d4a2d; --marked-text:#eaf7ea; --title-font: 'Cinzel Decorative', serif; --body-font:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
-  .theme-blood{ --bg:#0a0606; --bg2:#170909; --text:#f4dede; --accent:#b10b0b; --cell:#5e1515; --cell-text:#ffeaea; --marked:#2a0000; --marked-text:#ffb5b5; --title-font:'Playfair Display', serif; --body-font:'Playfair Display', serif }
-  .theme-cyberpunk{ --bg:#070717; --bg2:#0e0820; --text:#f0c8ff; --accent:#ff2d95; --cell:#19032a; --cell-text:#ffdff6; --marked:#2b003b; --marked-text:#ffd6f0; --title-font:'Orbitron', sans-serif; --body-font:'Orbitron', sans-serif }
-  .theme-nordic{ --bg:#07121a; --bg2:#0f2936; --text:#dff3ff; --accent:#7ec0ff; --cell:#082a3c; --cell-text:#dff3ff; --marked:#06202a; --marked-text:#bfe7ff; --title-font:'Cinzel Decorative', serif; --body-font:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
-  .theme-pixel{ --bg:#0b0b0b; --bg2:#141414; --text:#ffd166; --accent:#ffd166; --cell:#121212; --cell-text:#ffd166; --marked:#111111; --marked-text:#ffd166; --radius:4px; --title-font:'Press Start 2P', monospace; --body-font:'Press Start 2P', monospace }
+    #controls {
+        margin-bottom: 20px;
+    }
 
-  /* apply theme fonts to key elements */
-  body[class*="theme-"] h1 { font-family: var(--title-font) !important; }
-  body[class*="theme-"] { font-family: var(--body-font) !important; }
+    select, button {
+        padding: 8px 12px;
+        margin: 5px;
+        border: none;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    #grid {
+        display: grid;
+        gap: 5px;
+        margin-top: 20px;
+    }
+
+    .cell {
+        padding: 15px;
+        background: #222;
+        border-radius: 6px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .cell.marked {
+        background: #3fa93f;
+        color: black;
+        font-weight: bold;
+    }
+
+    #scoreBox {
+        margin-top: 20px;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    /* ---------------- TEMAS ---------------- */
+
+    /* PADRÃO / GAME AWARDS */
+    .theme-default {
+        --bg: #111;
+        --cell: #222;
+        --font: Arial, sans-serif;
+    }
+
+    /* NÓRDICO - GOD OF WAR */
+    @font-face {
+        font-family: "Nordic";
+        src: url("https://fonts.cdnfonts.com/s/17890/nordica.woff") format("woff");
+    }
+    .theme-nordic {
+        --bg: #2b2b2b;
+        --cell: #3a3a3a;
+        --font: "Nordic", serif;
+    }
+
+    /* BLOODBORNE */
+    @font-face {
+        font-family: "Bloodborne";
+        src: url("https://fonts.cdnfonts.com/s/24011/gothic_ultra_ot.otf") format("opentype");
+    }
+    .theme-bloodborne {
+        --bg: #0e0d0d;
+        --cell: #2a1f1f;
+        --font: "Bloodborne", serif;
+    }
+
+    /* NEON FUTURISTA */
+    @font-face {
+        font-family: "Neon";
+        src: url("https://fonts.cdnfonts.com/s/20738/neon_led_light.woff") format("woff");
+    }
+    .theme-neon {
+        --bg: #030014;
+        --cell: #111144;
+        --font: "Neon", sans-serif;
+        color: #7fffd4;
+        text-shadow: 0 0 6px #0ff;
+    }
+
+    /* PIXEL / 8-BIT */
+    @font-face {
+        font-family: "Pixel";
+        src: url("https://fonts.cdnfonts.com/s/14566/PressStart2P-Regular.woff") format("woff");
+    }
+    .theme-pixel {
+        --bg: #1b1b1b;
+        --cell: #333;
+        --font: "Pixel", monospace;
+    }
+
+    /* Aplicação automática do tema */
+    body {
+        background: var(--bg);
+        font-family: var(--font);
+    }
+    .cell { background: var(--cell); }
+
 </style>
 </head>
-<body class="theme-blood">
+<body class="theme-default">
 
-<div class="container">
-  <header>
-    <div>
-      <h1>NeuroBingo</h1>
-      <div class="subtitle">O melhor bingo do ano</div>
-    </div>
-    <div class="controls">
-      <label class="muted">Grid</label>
-      <select id="gridSize">
-        <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-      </select>
-      <button id="editBtn">✎ Editar</button>
-      <button id="shuffleBtn" class="ghost">Embaralhar</button>
-      <button id="generateBtn" class="ghost">Gerar aleatório</button>
-      <button id="downloadBtn" class="ghost">Baixar PNG</button>
-      <button id="shareBtn" class="ghost">Compartilhar</button>
-      <button id="muteBtn" class="ghost">🔊</button>
-    </div>
-  </header>
+<h1>O melhor bingo do ano</h1>
 
-  <div class="main">
-    <div class="board">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="stats">
-          <div class="stat">Linhas: <span id="linesCount">0</span></div>
-          <div class="stat">Colunas: <span id="colsCount">0</span></div>
-          <div class="stat">Diagonais: <span id="diagsCount">0</span></div>
-        </div>
-      </div>
+<div id="controls">
+    <select id="theme">
+        <option value="default">Padrão</option>
+        <option value="nordic">Nórdico (God of War)</option>
+        <option value="bloodborne">Bloodborne</option>
+        <option value="neon">Neon Futurista</option>
+        <option value="pixel">8-Bit</option>
+    </select>
 
-      <div id="grid" class="grid" aria-label="bingo-grid"></div>
-    </div>
+    <select id="size">
+        <option value="3">3x3</option>
+        <option value="4">4x4</option>
+        <option value="5">5x5</option>
+        <option value="6">6x6</option>
+        <option value="7">7x7</option>
+        <option value="8">8x8</option>
+        <option value="9">9x9</option>
+        <option value="10">10x10</option>
+    </select>
 
-    <aside class="sidebar">
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="muted">Temas</div>
-          <div class="muted">Som & Fonte</div>
-        </div>
-        <div class="theme-row" style="margin-top:8px">
-          <button class="theme-btn" data-theme="theme-default">Padrão</button>
-          <button class="theme-btn" data-theme="theme-blood">Bloodborne</button>
-          <button class="theme-btn" data-theme="theme-cyberpunk">Cyberpunk</button>
-          <button class="theme-btn" data-theme="theme-nordic">Nórdico</button>
-          <button class="theme-btn" data-theme="theme-pixel">Pixel 8-bit</button>
-        </div>
-      </div>
-
-      <div>
-        <div class="muted">Frases (uma por linha)</div>
-        <textarea id="phrases" style="width:100%;height:120px;margin-top:8px" placeholder="Cole frases aqui (uma por linha)."></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="applyPhrases">Aplicar</button>
-          <button id="fillFromList" class="ghost">Preencher</button>
-        </div>
-      </div>
-
-      <div>
-        <div class="muted">Salvar / Exportar</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="saveBtn" class="ghost">Salvar local</button>
-          <button id="exportBtn" class="ghost">Exportar JSON</button>
-          <button id="importBtn" class="ghost">Importar JSON</button>
-        </div>
-        <input type="file" id="fileImport" accept=".json" style="display:none" />
-      </div>
-
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="muted">Extras</div>
-          <div class="muted">Testes</div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="confettiBtn" class="ghost">Confete</button>
-          <button id="clearBtn" class="ghost">Limpar</button>
-        </div>
-      </div>
-    </aside>
-  </div>
+    <button onclick="generateGrid()">Gerar Bingo</button>
 </div>
 
-<div id="badge" class="badge">BINGO!</div>
-<div id="toast" class="toast"></div>
-<canvas id="confetti"></canvas>
+<div id="grid"></div>
 
-<!-- victory overlay -->
-<div id="overlay" class="overlay">
-  <div class="victory-panel">
-    <h2 id="victoryTitle">Parabéns!</h2>
-    <p id="victoryMsg">Você completou tudo — merece uma comemoração épica!</p>
-    <p class="muted" style="margin-top:10px">Compartilhe sua conquista com os amigos.</p>
-    <div style="margin-top:14px">
-      <button id="closeVictory">Fechar</button>
-      <button id="shareVictory" class="ghost">Compartilhar</button>
-    </div>
-  </div>
+<div id="scoreBox">
+    Linhas completas: <span id="lineCount">0</span><br>
+    Colunas completas: <span id="colCount">0</span><br>
+    Diagonais completas: <span id="diagCount">0</span><br>
 </div>
-
-<!-- html2canvas CDN (para export PNG) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-/* ---------------- State ---------------- */
-const state = {
-  size: 5,
-  editing: false,
-  cells: [],
-  marks: [],
-  theme: 'theme-blood',
-  phrasesPool: [],
-  completedRows: [],
-  completedCols: [],
-  completedDiags: [false,false],
-  soundsOn: true,
-}
+/* ----------------- FRASES ALEATÓRIAS ----------------- */
 
-/* ---------------- Elements ---------------- */
-const gridEl = document.getElementById('grid')
-const gridSizeSel = document.getElementById('gridSize')
-const editBtn = document.getElementById('editBtn')
-const shuffleBtn = document.getElementById('shuffleBtn')
-const generateBtn = document.getElementById('generateBtn')
-const downloadBtn = document.getElementById('downloadBtn')
-const shareBtn = document.getElementById('shareBtn')
-const muteBtn = document.getElementById('muteBtn')
-const phrasesTa = document.getElementById('phrases')
-const applyPhrasesBtn = document.getElementById('applyPhrases')
-const fillFromListBtn = document.getElementById('fillFromList')
-const linesCountEl = document.getElementById('linesCount')
-const colsCountEl = document.getElementById('colsCount')
-const diagsCountEl = document.getElementById('diagsCount')
-const themeBtns = document.querySelectorAll('.theme-btn')
-const badge = document.getElementById('badge')
-const toast = document.getElementById('toast')
-const exportBtn = document.getElementById('exportBtn')
-const importBtn = document.getElementById('importBtn')
-const fileImport = document.getElementById('fileImport')
-const saveBtn = document.getElementById('saveBtn')
-const clearBtn = document.getElementById('clearBtn')
-const confettiBtn = document.getElementById('confettiBtn')
+const phrases = [
+    "Jogo que ninguém pediu ganha prêmio",
+    "Trailer que emociona mais do que devia",
+    "Indie esmaga AAA novamente",
+    "Silêncio constrangedor no palco",
+    "Platéia vibra sem saber por quê",
+    "O apresentador fala rápido demais",
+    "Música épica sem motivo",
+    "Indicação inesperada do nada",
+    "Categoria aleatória aparecendo",
+    "Cinemática que nunca será assim no jogo",
+    "Multiplayer leva prêmio que não faz sentido",
+    "Jogo do ano vira discussão eterna",
+    "Discurso interrompido",
+    "Anúncio que ninguém entendeu",
+    "Menção a DLC surpresa",
+    "Performance musical aleatória"
+];
 
-const overlay = document.getElementById('overlay')
-const closeVictory = document.getElementById('closeVictory')
-const shareVictory = document.getElementById('shareVictory')
-const confettiCanvas = document.getElementById('confetti')
-const confettiCtx = confettiCanvas.getContext('2d')
+/* ----------------- SONS POR TEMA ----------------- */
 
-/* -------------- Utils -------------- */
-function showToast(msg, ms=1500){ toast.innerText = msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none', ms) }
-function showBadge(msg, ms=1600){ badge.innerText = msg; badge.style.display='block'; setTimeout(()=>badge.style.display='none', ms) }
+const sounds = {
+    default: "https://actions.google.com/sounds/v1/cartoon/pop.ogg",
+    nordic: "https://actions.google.com/sounds/v1/foley/wood_plank_flicks.ogg",
+    bloodborne: "https://actions.google.com/sounds/v1/horror/monster_growl.ogg",
+    neon: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg",
+    pixel: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+};
 
-function localSave(){
-  try{
-    const obj = {
-      size: state.size, cells: state.cells, marks: state.marks, theme: state.theme,
-      completedRows: state.completedRows, completedCols: state.completedCols, completedDiags: state.completedDiags
+let clickSound = new Audio(sounds.default);
+
+/* ----------------- GERAÇÃO DO GRID ----------------- */
+
+function generateGrid() {
+    const size = parseInt(document.getElementById("size").value);
+    const theme = document.getElementById("theme").value;
+
+    // mudar tema
+    document.body.className = "theme-" + theme;
+    clickSound = new Audio(sounds[theme]);
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+
+    let pool = [...phrases];
+
+    for (let i = 0; i < size * size; i++) {
+        const div = document.createElement("div");
+        div.classList.add("cell");
+
+        const text = pool[Math.floor(Math.random() * pool.length)];
+        div.textContent = text;
+
+        div.addEventListener("click", () => {
+            div.classList.toggle("marked");
+            clickSound.currentTime = 0;
+            clickSound.play();
+            updateScore();
+        });
+
+        grid.appendChild(div);
     }
-    localStorage.setItem('neurobingo_v3', JSON.stringify(obj))
-  }catch(e){ console.warn(e) }
+
+    updateScore();
 }
 
-function localLoad(){
-  try{
-    const raw = localStorage.getItem('neurobingo_v3')
-    if(!raw) return
-    const obj = JSON.parse(raw)
-    if(obj.size){ state.size = obj.size; state.cells = obj.cells || []; state.marks = obj.marks || []; state.theme = obj.theme || state.theme
-      state.completedRows = obj.completedRows || []; state.completedCols = obj.completedCols || []; state.completedDiags = obj.completedDiags || [false,false]
-      gridSizeSel.value = state.size
-      applyTheme(state.theme, false)
-      buildGrid(state.size)
-      render()
-      showToast('Progresso restaurado')
+/* ----------------- CONTAGEM ----------------- */
+
+function updateScore() {
+    const size = parseInt(document.getElementById("size").value);
+    const cells = [...document.querySelectorAll(".cell")];
+
+    const marked = i => cells[i].classList.contains("marked");
+
+    let lineTotal = 0, colTotal = 0, diagTotal = 0;
+
+    // linhas
+    for (let r = 0; r < size; r++) {
+        let ok = true;
+        for (let c = 0; c < size; c++) {
+            if (!marked(r * size + c)) ok = false;
+        }
+        if (ok) lineTotal++;
     }
-  }catch(e){ console.warn(e) }
-}
 
-/* -------------- Audio (per-theme melodies) -------------- */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-function playTone(freq, dur=0.06, type='sine', vol=0.06){
-  if(!state.soundsOn) return
-  const o = audioCtx.createOscillator(), g = audioCtx.createGain()
-  o.type = type; o.frequency.value = freq; g.gain.value = vol
-  o.connect(g); g.connect(audioCtx.destination)
-  o.start()
-  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur)
-  setTimeout(()=>{ o.stop() }, dur*1000 + 20)
-}
-function themeClickSound(){
-  if(state.theme === 'theme-cyberpunk'){
-    playTone(900,0.06,'sawtooth',0.05); setTimeout(()=>playTone(660,0.05,'sine',0.04),70)
-  } else if(state.theme === 'theme-nordic'){
-    playTone(420,0.08,'triangle',0.06)
-  } else if(state.theme === 'theme-pixel'){
-    // quick 8-bit beep
-    playTone(1200,0.03,'square',0.08); setTimeout(()=>playTone(900,0.03,'square',0.06),60)
-  } else if(state.theme === 'theme-blood'){
-    playTone(320,0.08,'sine',0.06)
-  } else {
-    playTone(540,0.06,'sine',0.06)
-  }
-}
-function playBingoSound(){ if(!state.soundsOn) return; playTone(520,0.26,'square',0.09); setTimeout(()=>playTone(860,0.12,'sine',0.08),240) }
-function playLineSound(){ if(!state.soundsOn) return; playTone(720,0.08,'sine',0.07) }
-function playShuffleSound(){ if(!state.soundsOn) return; playTone(400,0.06,'sawtooth',0.06); setTimeout(()=>playTone(520,0.05,'sine',0.05),80) }
-
-/* -------------- Build / Render Grid -------------- */
-function ensureStateArrays(size){
-  const total = size*size
-  if(!state.cells || state.cells.length !== total) state.cells = Array(total).fill('')
-  if(!state.marks || state.marks.length !== total) state.marks = Array(total).fill(false)
-  state.completedRows = Array(size).fill(false)
-  state.completedCols = Array(size).fill(false)
-  state.completedDiags = [false,false]
-}
-
-function buildGrid(size = state.size){
-  state.size = size
-  ensureStateArrays(size)
-  gridEl.innerHTML = ''
-  gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`
-  const total = size*size
-  for(let i=0;i<total;i++){
-    const div = document.createElement('div')
-    div.className = 'cell'
-    div.dataset.index = i
-    const inner = document.createElement('div'); inner.className='inner'; inner.style.width='100%'; inner.style.wordBreak='break-word'; inner.style.fontWeight='600'
-    inner.innerText = state.cells[i] || ''
-    div.appendChild(inner)
-    div.addEventListener('click', ()=> onCellClick(i, div))
-    div.addEventListener('dblclick', ()=> editCell(i))
-    gridEl.appendChild(div)
-  }
-  updateStatsUI()
-  localSave()
-}
-
-function render(){
-  const nodes = gridEl.querySelectorAll('.cell')
-  for(let i=0;i<nodes.length;i++){
-    const n = nodes[i]
-    n.querySelector('.inner').innerText = state.cells[i] || ''
-    n.classList.toggle('marked', !!state.marks[i])
-  }
-  updateStatsUI()
-}
-
-/* -------------- Edit / Click -------------- */
-function toggleEdit(){
-  state.editing = !state.editing
-  editBtn.innerText = state.editing ? '✓ Salvando' : '✎ Editar'
-  editBtn.style.opacity = state.editing ? '1' : '0.9'
-}
-editBtn.addEventListener('click', ()=> { toggleEdit(); localSave() })
-
-function editCell(index){
-  const prev = state.cells[index] || ''
-  const val = prompt('Edite o texto da célula:', prev)
-  if(val === null) return
-  state.cells[index] = val
-  state.marks[index] = false
-  render(); localSave()
-}
-
-function onCellClick(i, el){
-  if(state.editing){ editCell(i); return }
-  state.marks[i] = !state.marks[i]
-  render()
-  themeClickSound()
-  checkCompletes() // update counters
-  localSave()
-}
-
-/* -------------- Shuffle / Fill -------------- */
-function shuffle(){
-  const arr = state.cells.slice()
-  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]] }
-  state.cells = arr
-  state.marks = Array(state.size*state.size).fill(false)
-  render(); playShuffleSound(); showToast('Embaralhado'); localSave()
-}
-
-function randomFillFromPool(){
-  const pool = state.phrasesPool.slice()
-  const total = state.size*state.size
-  if(pool.length === 0){ showToast('Sem frases no pool'); return }
-  while(pool.length < total) pool.push(...state.phrasesPool)
-  for(let i=0;i<total;i++){
-    const j = Math.floor(Math.random()*pool.length)
-    state.cells[i] = pool.splice(j,1)[0]
-    state.marks[i] = false
-  }
-  render(); showToast('Preenchido aleatoriamente'); localSave()
-}
-
-/* -------------- Check completes (rows/cols/diags) -------------- */
-function checkCompletes(){
-  const n = state.size, m = state.marks
-  let newRow = false, newCol = false, newDiag = false
-  // rows
-  for(let r=0;r<n;r++){
-    let ok=true
-    for(let c=0;c<n;c++){ if(!m[r*n+c]){ ok=false; break } }
-    if(ok && !state.completedRows[r]){ state.completedRows[r]=true; newRow=true; showBadge(`Linha ${r+1} concluída`); playLineSound() }
-    if(!ok && state.completedRows[r]){ state.completedRows[r]=false }
-  }
-  // cols
-  for(let c=0;c<n;c++){
-    let ok=true
-    for(let r=0;r<n;r++){ if(!m[r*n+c]){ ok=false; break } }
-    if(ok && !state.completedCols[c]){ state.completedCols[c]=true; newCol=true; showBadge(`Coluna ${c+1} concluída`); playLineSound() }
-    if(!ok && state.completedCols[c]) state.completedCols[c]=false
-  }
-  // diag 0
-  let ok=true
-  for(let i=0;i<n;i++) if(!m[i*n+i]){ ok=false; break }
-  if(ok && !state.completedDiags[0]){ state.completedDiags[0]=true; newDiag=true; showBadge('Diagonal principal concluída'); playLineSound() }
-  if(!ok && state.completedDiags[0]) state.completedDiags[0]=false
-  // diag 1
-  ok=true
-  for(let i=0;i<n;i++) if(!m[i*n + (n-1-i)]){ ok=false; break }
-  if(ok && !state.completedDiags[1]){ state.completedDiags[1]=true; newDiag=true; showBadge('Diagonal secundária concluída'); playLineSound() }
-  if(!ok && state.completedDiags[1]) state.completedDiags[1]=false
-
-  updateStatsUI()
-  if(newRow || newCol || newDiag) {
-    setTimeout(()=>{ if(isEverythingCompleted()) triggerVictory() }, 300)
-  } else {
-    if(!isEverythingCompleted()) closeVictoryImmediate()
-  }
-  localSave()
-}
-
-function updateStatsUI(){
-  const lines = state.completedRows.filter(Boolean).length
-  const cols = state.completedCols.filter(Boolean).length
-  const diags = state.completedDiags.filter(Boolean).length
-  linesCountEl.innerText = lines
-  colsCountEl.innerText = cols
-  diagsCountEl.innerText = diags
-}
-
-function isEverythingCompleted(){
-  const totalPossible = state.size + state.size + 2
-  const have = state.completedRows.filter(Boolean).length + state.completedCols.filter(Boolean).length + state.completedDiags.filter(Boolean).length
-  return have === totalPossible
-}
-
-/* -------------- Victory -------------- */
-function triggerVictory(){
-  if(isEverythingCompleted()){
-    playBingoSound()
-    overlay.classList.add('show')
-    confettiBurst(200)
-    document.getElementById('victoryTitle').innerText = 'VOCÊ CONSEGUIU TUDO!'
-    document.getElementById('victoryMsg').innerText = 'Todas as linhas, colunas e diagonais foram concluídas — merece uma comemoração ÉPICA.'
-    showToast('Vitória completa!', 2200)
-  }
-}
-function closeVictoryImmediate(){ overlay.classList.remove('show') }
-
-/* -------------- Confetti (simple) -------------- */
-function resizeConfetti(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight }
-window.addEventListener('resize', resizeConfetti); resizeConfetti()
-let confettiPieces = []
-function confettiBurst(count=100){
-  confettiPieces = []
-  for(let i=0;i<count;i++){
-    confettiPieces.push({
-      x: Math.random()*confettiCanvas.width,
-      y: -Math.random()*200,
-      vx: (Math.random()-0.5)*8,
-      vy: 2 + Math.random()*6,
-      size: 6 + Math.random()*10,
-      color: `hsl(${Math.random()*360} 80% 60%)`,
-      rot: Math.random()*360, rotSpeed:(Math.random()-0.5)*10
-    })
-  }
-  if(!animatingConfetti) requestAnimationFrame(confettiLoop)
-}
-let animatingConfetti = false
-function confettiLoop(){
-  animatingConfetti = true
-  confettiCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height)
-  for(let p of confettiPieces){
-    p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.rot += p.rotSpeed
-    confettiCtx.save()
-    confettiCtx.translate(p.x, p.y); confettiCtx.rotate(p.rot * Math.PI/180)
-    confettiCtx.fillStyle = p.color
-    confettiCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6)
-    confettiCtx.restore()
-  }
-  confettiPieces = confettiPieces.filter(p => p.y < confettiCanvas.height + 100)
-  if(confettiPieces.length>0) requestAnimationFrame(confettiLoop)
-  else animatingConfetti = false
-}
-
-/* -------------- Share / Download / JSON -------------- */
-function makeShareURL(){
-  const data = {size: state.size, cells: state.cells}
-  const s = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
-  const u = location.origin + location.pathname + '?b=' + encodeURIComponent(s)
-  navigator.clipboard.writeText(u).then(()=> showToast('Link copiado!'))
-}
-async function downloadPNG(){
-  showToast('Gerando imagem...')
-  try{
-    const canvas = await html2canvas(gridEl, {backgroundColor: null, scale:2})
-    const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = 'neurobingo.png'; a.click()
-    showToast('Imagem pronta')
-  }catch(e){ showToast('Erro ao gerar imagem') }
-}
-function exportJSON(){
-  const obj = {
-    size: state.size, cells: state.cells, marks: state.marks,
-    completedRows: state.completedRows, completedCols: state.completedCols, completedDiags: state.completedDiags, theme: state.theme
-  }
-  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'})
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='neurobingo_export.json'; a.click()
-}
-function importJSONFile(file){
-  const r = new FileReader()
-  r.onload = ()=> {
-    try{
-      const obj = JSON.parse(r.result)
-      if(obj.size && Array.isArray(obj.cells)){
-        state.size = obj.size; state.cells = obj.cells; state.marks = obj.marks || Array(state.size*state.size).fill(false)
-        state.completedRows = obj.completedRows || Array(state.size).fill(false)
-        state.completedCols = obj.completedCols || Array(state.size).fill(false)
-        state.completedDiags = obj.completedDiags || [false,false]
-        gridSizeSel.value = state.size
-        applyTheme(obj.theme || state.theme)
-        buildGrid(state.size); render(); localSave(); showToast('Arquivo importado')
-      } else showToast('JSON inválido')
-    }catch(e){ showToast('Erro ao importar') }
-  }
-  r.readAsText(file)
-}
-
-/* ---------- Events wiring ---------- */
-gridSizeSel.addEventListener('change', ()=>{
-  const s = parseInt(gridSizeSel.value); state.size = s
-  ensureStateArrays(s); buildGrid(s); render(); localSave()
-})
-shuffleBtn.addEventListener('click', ()=> shuffle())
-generateBtn.addEventListener('click', ()=> randomFillFromPool())
-downloadBtn.addEventListener('click', ()=> downloadPNG())
-shareBtn.addEventListener('click', ()=> makeShareURL())
-muteBtn.addEventListener('click', ()=> { state.soundsOn = !state.soundsOn; muteBtn.innerText = state.soundsOn ? '🔊' : '🔇' })
-applyPhrasesBtn.addEventListener('click', ()=>{
-  const raw = phrasesTa.value.trim()
-  state.phrasesPool = raw.split('\n').map(s=>s.trim()).filter(Boolean)
-  showToast(state.phrasesPool.length + ' frases carregadas'); localSave()
-})
-fillFromListBtn.addEventListener('click', ()=> randomFillFromPool())
-saveBtn.addEventListener('click', ()=> { localSave(); showToast('Salvo localmente') })
-clearBtn.addEventListener('click', ()=> {
-  if(confirm('Limpar cartela?')){
-    state.cells = Array(state.size*state.size).fill(''); state.marks = Array(state.size*state.size).fill(false)
-    state.completedRows = Array(state.size).fill(false); state.completedCols = Array(state.size).fill(false); state.completedDiags = [false,false]
-    render(); localSave()
-  }
-})
-confettiBtn.addEventListener('click', ()=> confettiBurst(120))
-exportBtn.addEventListener('click', ()=> exportJSON())
-importBtn.addEventListener('click', ()=> fileImport.click())
-fileImport.addEventListener('change', (e)=> { if(e.target.files[0]) importJSONFile(e.target.files[0]) })
-
-themeBtns.forEach(b => b.addEventListener('click', ()=> applyTheme(b.dataset.theme)))
-
-closeVictory.addEventListener('click', ()=> { overlay.classList.remove('show') })
-shareVictory.addEventListener('click', ()=> { makeShareURL(); showToast('Link de vitória copiado') })
-
-/* ---------- Theme application ---------- */
-function applyTheme(cls, save=true){
-  document.body.className = cls || 'theme-default'
-  state.theme = cls || 'theme-default'
-  if(save) localSave()
-  // small sound to indicate change
-  if(state.soundsOn) { playTone(640,0.06,'sine',0.06) }
-}
-
-/* ---------- Load from URL (share) ---------- */
-function loadFromURL(){
-  const p = new URLSearchParams(location.search)
-  if(!p.has('b')) return
-  try{
-    const decoded = decodeURIComponent(p.get('b'))
-    const obj = JSON.parse(decodeURIComponent(escape(atob(decoded))))
-    if(obj && obj.size && Array.isArray(obj.cells)){
-      state.size = obj.size; state.cells = obj.cells; state.marks = Array(state.size*state.size).fill(false)
-      gridSizeSel.value = state.size
-      buildGrid(state.size); render(); showToast('Cartela carregada do link')
+    // colunas
+    for (let c = 0; c < size; c++) {
+        let ok = true;
+        for (let r = 0; r < size; r++) {
+            if (!marked(r * size + c)) ok = false;
+        }
+        if (ok) colTotal++;
     }
-  }catch(e){ console.warn('loadFromURL', e) }
-}
 
-/* ---------- Initialization ---------- */
-function start(){
-  gridSizeSel.value = state.size
-  ensureStateArrays(state.size)
-  applyTheme(state.theme, false)
-  buildGrid(state.size)
-  localLoad()
-  loadFromURL()
-  render()
-}
-start()
-
-/* ---------- Clipboard quick import (paste JSON) ---------- */
-window.addEventListener('paste', (ev) => {
-  try{
-    const t = ev.clipboardData.getData('text')
-    if(t && t.startsWith('{') && t.includes('cells')){
-      const obj = JSON.parse(t)
-      if(obj.size && Array.isArray(obj.cells)){
-        state.size = obj.size; state.cells = obj.cells; state.marks = obj.marks || Array(state.size*state.size).fill(false)
-        gridSizeSel.value = state.size; buildGrid(state.size); render(); showToast('Cartela importada do clipboard')
-      }
+    // diagonal principal
+    let ok1 = true;
+    for (let i = 0; i < size; i++) {
+        if (!marked(i * size + i)) ok1 = false;
     }
-  }catch(err){}
-})
+    if (ok1) diagTotal++;
 
-/* ---------- Small helpers ---------- */
-function showToastThenHide(msg,ms=1300){ showToast(msg,ms) }
+    // diagonal secundária
+    let ok2 = true;
+    for (let i = 0; i < size; i++) {
+        if (!marked(i * size + (size - 1 - i))) ok2 = false;
+    }
+    if (ok2) diagTotal++;
 
-/* ---------- End ---------- */
+    document.getElementById("lineCount").textContent = lineTotal;
+    document.getElementById("colCount").textContent = colTotal;
+    document.getElementById("diagCount").textContent = diagTotal;
+
+    // tudo completo
+    if (lineTotal === size && colTotal === size && diagTotal === 2) {
+        alert("✨ VOCÊ COMPLETOU O BINGO INTEIRO! Um verdadeiro campeão do Game Awards! ✨");
+    }
+}
+
 </script>
+
 </body>
 </html>
