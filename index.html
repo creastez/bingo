@@ -4,18 +4,30 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>NeuroBingo — Final</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Fonts chosen for themes:
+     Cinzel Decorative (nórdico/runic-ish),
+     Playfair Display (bloodborne/gothic),
+     Orbitron (cyberpunk/neon),
+     Press Start 2P (pixel 8-bit)
+-->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:wght@400;700&family=Orbitron:wght@400;700&family=Press+Start+2P&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
   :root{
     --bg:#0b0b0b; --bg2:#111; --text:#e9e9ea; --accent:#b64b4b; --muted:rgba(255,255,255,0.7);
     --cell:#222; --cell-text:#eee; --cell-border:#1a1a1a; --marked:#2d4a2d; --marked-text:#eaf7ea;
     --radius:10px; --gap:8px; --cell-size:84px;
+    --title-font: 'Cinzel Decorative', serif;
+    --body-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui, -apple-system, 'Segoe UI', Roboto, Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+  /* Base */
+  html,body{height:100%;margin:0;font-family:var(--body-font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   .container{max-width:1120px;margin:18px auto;padding:18px}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{font-family:Cinzel, serif;margin:0;color:var(--accent);font-size:26px}
-  .muted{color:var(--muted);font-size:13px}
+  h1{font-family:var(--title-font);margin:0;color:var(--accent);font-size:28px}
+  .subtitle{font-size:13px;color:var(--muted);margin-top:4px}
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   select,textarea,input[type="text"]{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--text)}
   button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer;font-weight:600}
@@ -42,18 +54,17 @@
   .victory-panel p{margin:0 0 16px}
   /* small screens */
   @media(max-width:980px){ .main{flex-direction:column} .sidebar{width:100%} .grid{padding:8px} }
-  /* Themes */
-  .theme-cyberpunk{ --bg:#070717; --bg2:#0e0820; --text:#f0c8ff; --accent:#ff2d95; --cell:#19032a; --cell-text:#ffdff6; --marked:#2b003b; --marked-text:#ffd6f0 }
-  .theme-nordic{ --bg:#07121a; --bg2:#0f2936; --text:#dff3ff; --accent:#7ec0ff; --cell:#082a3c; --cell-text:#dff3ff; --marked:#06202a; --marked-text:#bfe7ff }
-  .theme-pixel{ --bg:#0b0b0b; --bg2:#141414; --text:#ffd166; --accent:#ffd166; --cell:#121212; --cell-text:#ffd166; --marked:#111111; --marked-text:#ffd166; --radius:4px }
-  .theme-blood{ --bg:#0a0606; --bg2:#170909; --text:#f4dede; --accent:#b10b0b; --cell:#5e1515; --cell-text:#ffeaea; --marked:#2a0000; --marked-text:#ffb5b5 }
-  .theme-default{ --bg:#0b0b0b; --bg2:#111; --text:#e9e9ea; --accent:#b64b4b; --cell:#222; --cell-text:#eee; --marked:#2d4a2d; --marked-text:#eaf7ea }
-  /* apply root background from theme variables */
-  body.theme-cyberpunk{ background:var(--bg); color:var(--text) }
-  body.theme-nordic{ background:var(--bg); color:var(--text) }
-  body.theme-pixel{ background:var(--bg); color:var(--text) }
-  body.theme-blood{ background:var(--bg); color:var(--text) }
-  body.theme-default{ background:var(--bg); color:var(--text) }
+
+  /* ---------------- THEMES: colors + fonts ---------------- */
+  .theme-default{ --bg:#0b0b0b; --bg2:#111; --text:#e9e9ea; --accent:#b64b4b; --cell:#222; --cell-text:#eee; --marked:#2d4a2d; --marked-text:#eaf7ea; --title-font: 'Cinzel Decorative', serif; --body-font:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
+  .theme-blood{ --bg:#0a0606; --bg2:#170909; --text:#f4dede; --accent:#b10b0b; --cell:#5e1515; --cell-text:#ffeaea; --marked:#2a0000; --marked-text:#ffb5b5; --title-font:'Playfair Display', serif; --body-font:'Playfair Display', serif }
+  .theme-cyberpunk{ --bg:#070717; --bg2:#0e0820; --text:#f0c8ff; --accent:#ff2d95; --cell:#19032a; --cell-text:#ffdff6; --marked:#2b003b; --marked-text:#ffd6f0; --title-font:'Orbitron', sans-serif; --body-font:'Orbitron', sans-serif }
+  .theme-nordic{ --bg:#07121a; --bg2:#0f2936; --text:#dff3ff; --accent:#7ec0ff; --cell:#082a3c; --cell-text:#dff3ff; --marked:#06202a; --marked-text:#bfe7ff; --title-font:'Cinzel Decorative', serif; --body-font:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
+  .theme-pixel{ --bg:#0b0b0b; --bg2:#141414; --text:#ffd166; --accent:#ffd166; --cell:#121212; --cell-text:#ffd166; --marked:#111111; --marked-text:#ffd166; --radius:4px; --title-font:'Press Start 2P', monospace; --body-font:'Press Start 2P', monospace }
+
+  /* apply theme fonts to key elements */
+  body[class*="theme-"] h1 { font-family: var(--title-font) !important; }
+  body[class*="theme-"] { font-family: var(--body-font) !important; }
 </style>
 </head>
 <body class="theme-blood">
@@ -62,7 +73,7 @@
   <header>
     <div>
       <h1>NeuroBingo</h1>
-      <div class="muted">Game Awards edition — divirta-se com os amigos</div>
+      <div class="subtitle">O melhor bingo do ano</div>
     </div>
     <div class="controls">
       <label class="muted">Grid</label>
@@ -86,7 +97,6 @@
           <div class="stat">Colunas: <span id="colsCount">0</span></div>
           <div class="stat">Diagonais: <span id="diagsCount">0</span></div>
         </div>
-        <div class="muted">Contagem automática — cada linha/col/diag conta uma vez</div>
       </div>
 
       <div id="grid" class="grid" aria-label="bingo-grid"></div>
@@ -96,14 +106,14 @@
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div class="muted">Temas</div>
-          <div class="muted">Som por tema</div>
+          <div class="muted">Som & Fonte</div>
         </div>
         <div class="theme-row" style="margin-top:8px">
           <button class="theme-btn" data-theme="theme-default">Padrão</button>
           <button class="theme-btn" data-theme="theme-blood">Bloodborne</button>
           <button class="theme-btn" data-theme="theme-cyberpunk">Cyberpunk</button>
           <button class="theme-btn" data-theme="theme-nordic">Nórdico</button>
-          <button class="theme-btn" data-theme="theme-pixel">Pixel</button>
+          <button class="theme-btn" data-theme="theme-pixel">Pixel 8-bit</button>
         </div>
       </div>
 
@@ -113,7 +123,6 @@
         <div style="display:flex;gap:8px;margin-top:8px">
           <button id="applyPhrases">Aplicar</button>
           <button id="fillFromList" class="ghost">Preencher</button>
-          <button id="loadGA" class="ghost">Carregar GameAwards</button>
         </div>
       </div>
 
@@ -166,13 +175,13 @@
 const state = {
   size: 5,
   editing: false,
-  cells: [],     // strings
-  marks: [],     // booleans
+  cells: [],
+  marks: [],
   theme: 'theme-blood',
   phrasesPool: [],
-  completedRows: [], // booleans length size
+  completedRows: [],
   completedCols: [],
-  completedDiags: [false,false], // two diagonals
+  completedDiags: [false,false],
   soundsOn: true,
 }
 
@@ -200,7 +209,6 @@ const fileImport = document.getElementById('fileImport')
 const saveBtn = document.getElementById('saveBtn')
 const clearBtn = document.getElementById('clearBtn')
 const confettiBtn = document.getElementById('confettiBtn')
-const loadGA = document.getElementById('loadGA')
 
 const overlay = document.getElementById('overlay')
 const closeVictory = document.getElementById('closeVictory')
@@ -218,13 +226,13 @@ function localSave(){
       size: state.size, cells: state.cells, marks: state.marks, theme: state.theme,
       completedRows: state.completedRows, completedCols: state.completedCols, completedDiags: state.completedDiags
     }
-    localStorage.setItem('neurobingo_v2', JSON.stringify(obj))
+    localStorage.setItem('neurobingo_v3', JSON.stringify(obj))
   }catch(e){ console.warn(e) }
 }
 
 function localLoad(){
   try{
-    const raw = localStorage.getItem('neurobingo_v2')
+    const raw = localStorage.getItem('neurobingo_v3')
     if(!raw) return
     const obj = JSON.parse(raw)
     if(obj.size){ state.size = obj.size; state.cells = obj.cells || []; state.marks = obj.marks || []; state.theme = obj.theme || state.theme
@@ -255,6 +263,7 @@ function themeClickSound(){
   } else if(state.theme === 'theme-nordic'){
     playTone(420,0.08,'triangle',0.06)
   } else if(state.theme === 'theme-pixel'){
+    // quick 8-bit beep
     playTone(1200,0.03,'square',0.08); setTimeout(()=>playTone(900,0.03,'square',0.06),60)
   } else if(state.theme === 'theme-blood'){
     playTone(320,0.08,'sine',0.06)
@@ -346,7 +355,6 @@ function randomFillFromPool(){
   const pool = state.phrasesPool.slice()
   const total = state.size*state.size
   if(pool.length === 0){ showToast('Sem frases no pool'); return }
-  // duplicate pool until enough
   while(pool.length < total) pool.push(...state.phrasesPool)
   for(let i=0;i<total;i++){
     const j = Math.floor(Math.random()*pool.length)
@@ -365,7 +373,7 @@ function checkCompletes(){
     let ok=true
     for(let c=0;c<n;c++){ if(!m[r*n+c]){ ok=false; break } }
     if(ok && !state.completedRows[r]){ state.completedRows[r]=true; newRow=true; showBadge(`Linha ${r+1} concluída`); playLineSound() }
-    if(!ok && state.completedRows[r]){ state.completedRows[r]=false } // allow decrement if user unmarked
+    if(!ok && state.completedRows[r]){ state.completedRows[r]=false }
   }
   // cols
   for(let c=0;c<n;c++){
@@ -374,24 +382,21 @@ function checkCompletes(){
     if(ok && !state.completedCols[c]){ state.completedCols[c]=true; newCol=true; showBadge(`Coluna ${c+1} concluída`); playLineSound() }
     if(!ok && state.completedCols[c]) state.completedCols[c]=false
   }
-  // diag 0 (left-top to right-bottom)
+  // diag 0
   let ok=true
   for(let i=0;i<n;i++) if(!m[i*n+i]){ ok=false; break }
   if(ok && !state.completedDiags[0]){ state.completedDiags[0]=true; newDiag=true; showBadge('Diagonal principal concluída'); playLineSound() }
   if(!ok && state.completedDiags[0]) state.completedDiags[0]=false
-  // diag 1 (right-top to left-bottom)
+  // diag 1
   ok=true
   for(let i=0;i<n;i++) if(!m[i*n + (n-1-i)]){ ok=false; break }
   if(ok && !state.completedDiags[1]){ state.completedDiags[1]=true; newDiag=true; showBadge('Diagonal secundária concluída'); playLineSound() }
   if(!ok && state.completedDiags[1]) state.completedDiags[1]=false
 
   updateStatsUI()
-  // if any new completion, play a short sound
   if(newRow || newCol || newDiag) {
-    // small delay to allow line sound then check global victory
     setTimeout(()=>{ if(isEverythingCompleted()) triggerVictory() }, 300)
   } else {
-    // in case something was unmarked and now all undone, maybe still check victory removal
     if(!isEverythingCompleted()) closeVictoryImmediate()
   }
   localSave()
@@ -406,7 +411,6 @@ function updateStatsUI(){
   diagsCountEl.innerText = diags
 }
 
-/* total possible = n rows + n cols + 2 diagonals */
 function isEverythingCompleted(){
   const totalPossible = state.size + state.size + 2
   const have = state.completedRows.filter(Boolean).length + state.completedCols.filter(Boolean).length + state.completedDiags.filter(Boolean).length
@@ -417,7 +421,6 @@ function isEverythingCompleted(){
 function triggerVictory(){
   if(isEverythingCompleted()){
     playBingoSound()
-    // show overlay + confetti
     overlay.classList.add('show')
     confettiBurst(200)
     document.getElementById('victoryTitle').innerText = 'VOCÊ CONSEGUIU TUDO!'
@@ -425,9 +428,7 @@ function triggerVictory(){
     showToast('Vitória completa!', 2200)
   }
 }
-function closeVictoryImmediate(){
-  overlay.classList.remove('show')
-}
+function closeVictoryImmediate(){ overlay.classList.remove('show') }
 
 /* -------------- Confetti (simple) -------------- */
 function resizeConfetti(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight }
@@ -472,7 +473,6 @@ function makeShareURL(){
   const u = location.origin + location.pathname + '?b=' + encodeURIComponent(s)
   navigator.clipboard.writeText(u).then(()=> showToast('Link copiado!'))
 }
-
 async function downloadPNG(){
   showToast('Gerando imagem...')
   try{
@@ -481,7 +481,6 @@ async function downloadPNG(){
     showToast('Imagem pronta')
   }catch(e){ showToast('Erro ao gerar imagem') }
 }
-
 function exportJSON(){
   const obj = {
     size: state.size, cells: state.cells, marks: state.marks,
@@ -490,7 +489,6 @@ function exportJSON(){
   const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'})
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='neurobingo_export.json'; a.click()
 }
-
 function importJSONFile(file){
   const r = new FileReader()
   r.onload = ()=> {
@@ -510,35 +508,20 @@ function importJSONFile(file){
   r.readAsText(file)
 }
 
-/* ---------- Presets ---------- */
-const presetGameAwards = [
-  "Trailer com gameplay","Anúncio surpresa","Indie ganha prêmio principal","Multiplayer anunciado","Port para Switch anunciado",
-  "Remake/Remaster anunciado","Hideo Kojima mencionado","Apresentador faz piada","Novo IP anunciado","Live reaction famosa",
-  "Corte de música ao vivo","Gameplay de AAA","Clássico retornando","DLC anunciada","Erro técnico ao vivo",
-  "Cosplayer no público","Parceria inesperada","Trailer com ritmo acelerado","3rd party exclusive","Desconhecido viral"
-]
-loadGA.addEventListener('click', ()=>{
-  phrasesTa.value = presetGameAwards.join('\\n'); applyPhrasesBtn.click()
-  showToast('Preset GameAwards carregado')
-})
-
 /* ---------- Events wiring ---------- */
 gridSizeSel.addEventListener('change', ()=>{
   const s = parseInt(gridSizeSel.value); state.size = s
   ensureStateArrays(s); buildGrid(s); render(); localSave()
 })
-shuffleBtn.addEventListener('click', ()=> { shuffle(); })
-generateBtn.addEventListener('click', ()=> { randomFillFromPool() })
-downloadBtn.addEventListener('click', ()=> { downloadPNG() })
-shareBtn.addEventListener('click', ()=> { makeShareURL() })
-muteBtn.addEventListener('click', ()=> {
-  state.soundsOn = !state.soundsOn; muteBtn.innerText = state.soundsOn ? '🔊' : '🔇'
-})
+shuffleBtn.addEventListener('click', ()=> shuffle())
+generateBtn.addEventListener('click', ()=> randomFillFromPool())
+downloadBtn.addEventListener('click', ()=> downloadPNG())
+shareBtn.addEventListener('click', ()=> makeShareURL())
+muteBtn.addEventListener('click', ()=> { state.soundsOn = !state.soundsOn; muteBtn.innerText = state.soundsOn ? '🔊' : '🔇' })
 applyPhrasesBtn.addEventListener('click', ()=>{
   const raw = phrasesTa.value.trim()
   state.phrasesPool = raw.split('\n').map(s=>s.trim()).filter(Boolean)
-  showToast(state.phrasesPool.length + ' frases carregadas')
-  localSave()
+  showToast(state.phrasesPool.length + ' frases carregadas'); localSave()
 })
 fillFromListBtn.addEventListener('click', ()=> randomFillFromPool())
 saveBtn.addEventListener('click', ()=> { localSave(); showToast('Salvo localmente') })
@@ -585,23 +568,15 @@ function loadFromURL(){
 
 /* ---------- Initialization ---------- */
 function start(){
-  // default
   gridSizeSel.value = state.size
   ensureStateArrays(state.size)
   applyTheme(state.theme, false)
   buildGrid(state.size)
-  // try to load local
   localLoad()
-  // try to load from URL (overrides local)
   loadFromURL()
   render()
 }
 start()
-
-/* ---------- Keyboard accessibility ---------- */
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape' && overlay.classList.contains('show')) overlay.classList.remove('show')
-})
 
 /* ---------- Clipboard quick import (paste JSON) ---------- */
 window.addEventListener('paste', (ev) => {
